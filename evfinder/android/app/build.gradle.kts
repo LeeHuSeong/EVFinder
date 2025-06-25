@@ -37,3 +37,12 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // Firebase BoM (버전 관리 통합)
+    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
+
+    //사용할 Firebase 모듈 추가 (예: Analytics, Auth 등)
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+}

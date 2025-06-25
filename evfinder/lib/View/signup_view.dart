@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import '../Controller/login_controller.dart';
-import 'signup_view.dart'; // 회원가입 화면 import 추가
+import '../Controller/signup_controller.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({Key? key}) : super(key: key);
+class SignupView extends StatefulWidget {
+  const SignupView({Key? key}) : super(key: key);
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<SignupView> createState() => _SignupViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
-  final LoginController _controller = LoginController();
+class _SignupViewState extends State<SignupView> {
+  final SignupController _controller = SignupController();
 
   @override
   void dispose() {
@@ -21,7 +20,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('로그인')),
+      appBar: AppBar(title: const Text('회원가입')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -37,17 +36,7 @@ class _LoginViewState extends State<LoginView> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => _controller.login(context),
-              child: const Text('로그인'),
-            ),
-            const SizedBox(height: 10),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignupView()),
-                );
-              },
+              onPressed: () => _controller.signUp(context),
               child: const Text('회원가입'),
             ),
           ],

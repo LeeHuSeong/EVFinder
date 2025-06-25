@@ -41,6 +41,10 @@ class _LoginViewState extends State<LoginView> {
               child: const Text('로그인'),
             ),
             const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => _controller.signInWithGoogle(context),
+              child: const Text('Google로 로그인'),
+            ),
             TextButton(
               onPressed: () {
                 Navigator.push(

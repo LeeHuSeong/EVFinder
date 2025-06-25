@@ -17,24 +17,36 @@ class _SignupViewState extends State<SignupView> {
     super.dispose();
   }
 
+  void _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('회원가입')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: _controller.emailController,
               decoration: const InputDecoration(labelText: '이메일'),
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: _controller.passwordController,
               decoration: const InputDecoration(labelText: '비밀번호'),
               obscureText: true,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _controller.confirmPasswordController,
+              decoration: const InputDecoration(labelText: '비밀번호 확인'),
+              obscureText: true,
+            ),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => _controller.signUp(context),
               child: const Text('회원가입'),

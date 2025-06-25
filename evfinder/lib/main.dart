@@ -5,7 +5,7 @@ import 'View/login_view.dart';  // 로그인 화면 import
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Firebase 초기화
-
+  
   runApp(const MyApp());
 }
 

@@ -70,7 +70,7 @@ class LoginController {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) return; // 로그인 취소
 
-
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);

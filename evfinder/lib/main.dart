@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'View/login_view.dart';  // 로그인 화면 import
+import 'View/login_view.dart'; // 로그인 화면 import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,11 +16,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'EVFinder',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
-      ),
-      home: const LoginView(),  // 로그인 화면이 처음 뜨도록
+      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.green), useMaterial3: true),
+      home: const LoginView(), // 로그인 화면이 처음 뜨도록
     );
   }
 }

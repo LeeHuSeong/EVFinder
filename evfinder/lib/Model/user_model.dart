@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class UserModel {
   
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  
   Future<User?> signIn(String email, String password) async {
     try {
       UserCredential cred = await _auth.signInWithEmailAndPassword(email: email, password: password);
@@ -27,4 +27,5 @@ class UserModel {
   }
 
   User? get currentUser => _auth.currentUser;
+  
 }

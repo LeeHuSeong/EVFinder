@@ -17,6 +17,7 @@ void main() async {
         NAnotherAuthFailedException() =>
             print("인증 실패: $ex"),
       });
+
   runApp(const MyApp());
 }
 

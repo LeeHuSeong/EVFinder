@@ -30,6 +30,7 @@ class _SignupViewState extends State<SignupView> {
     setState(() {
       _isLoading = false;
     });
+
   }
 
   @override
@@ -294,6 +295,7 @@ class _SignupViewState extends State<SignupView> {
                   ),
                 ),
               ],
+
             ),
           ),
         ),

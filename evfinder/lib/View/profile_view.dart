@@ -35,11 +35,17 @@ class ProfileView extends StatelessWidget {
           ),
           SizedBox(height: 20),
           Divider(thickness: 1.5, endIndent: 20, indent: 20),
-          Padding(
-            padding: const EdgeInsets.only(left: 20.0, top: 15),
-            child: ListTile(
-              leading: Icon(Icons.star, color: Colors.yellow),
-              title: Text("즐겨찾기"),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0, top: 15),
+                  child: ListTile(
+                    leading: Icon(Icons.star, color: Colors.yellow),
+                    title: Text("즐겨찾기"),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

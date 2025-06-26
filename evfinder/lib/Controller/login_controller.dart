@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../Model/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../View/map_view.dart'; // ✅ 지도 화면 import
 
 class LoginController {
   final emailController = TextEditingController();
@@ -17,6 +18,15 @@ class LoginController {
     return email.isNotEmpty && password.length >= 6;
   }
 
+  /// ✅ 로그인 성공 후 공통 처리
+  void _onLoginSuccess(BuildContext context, String email) {
+    _showMessage(context, "로그인 성공: $email");
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const MapView()),
+    );
+  }
+
   Future<void> login(BuildContext context) async {
     final email = emailController.text.trim();
     final password = passwordController.text;
@@ -29,9 +39,7 @@ class LoginController {
     try {
       final user = await _model.signIn(email, password);
       if (user != null) {
-        _showMessage(context, "로그인 성공: ${user.email}");
-        // 로그인 성공 후 화면 이동 처리
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeView()));
+        _onLoginSuccess(context, user.email!);
       }
     } on FirebaseAuthException catch (e) {
       String message;
@@ -83,8 +91,7 @@ class LoginController {
       final user = userCredential.user;
 
       if (user != null) {
-        _showMessage(context, 'Google 로그인 성공: ${user.email}');
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeView()));
+        _onLoginSuccess(context, user.email!);
       }
     } catch (e) {
       _showMessage(context, 'Google 로그인 실패: ${e.toString()}');

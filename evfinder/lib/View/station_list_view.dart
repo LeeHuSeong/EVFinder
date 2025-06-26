@@ -44,7 +44,7 @@ class _StationListViewState extends State<StationListView> {
                     '${station.location.latitude}, ${station.location.longitude}',
                   ),
                   onTap: () {
-                    // 충전소 상세 이동 or chargers 조회
+                    // 충전소 상세 이동 or chargers 조회 
                   },
                 );
               },

@@ -1,5 +1,6 @@
 import 'package:evfinder/View/profile_view.dart';
 import 'package:evfinder/View/search_charger_view.dart';
+import 'package:evfinder/View/setting_view.dart';
 import 'package:evfinder/View/station_list_view.dart';
 import 'package:flutter/material.dart';
 
@@ -23,7 +24,19 @@ class _MainViewState extends State<MainView> {
           ? null
           : AppBar(
               title: Text("EVFinder"),
-              actions: selectedIndex == 2 ? [IconButton(onPressed: () {}, icon: Icon(Icons.settings))] : null,
+              actions: selectedIndex == 2
+                  ? [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SettingView()), // 또는 MainView
+                          );
+                        },
+                        icon: Icon(Icons.settings),
+                      ),
+                    ]
+                  : null,
             ),
       //Navigation Bar
       bottomNavigationBar: BottomAppBar(
@@ -41,7 +54,7 @@ class _MainViewState extends State<MainView> {
                       selectedIndex = 0;
                     });
                   },
-                  icon: Icon(Icons.search, size: 35),
+                  icon: Icon(Icons.star, size: 35),
                   color: selectedIndex == 0 ? Colors.green : Colors.black12,
                 ),
                 IconButton(

@@ -10,8 +10,34 @@ class SearchChargerView extends StatefulWidget {
 class _SearchChargerViewState extends State<SearchChargerView> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Row(mainAxisAlignment: MainAxisAlignment.start, children: []),
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.06,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.white,
+              border: Border.all(color: Colors.grey),
+            ),
+            child: ListTile(
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+              trailing: Icon(Icons.search),
+              title: TextField(
+                // onSubmitted: submitted,
+                // controller: controller,
+                decoration: InputDecoration(hintText: "충전소 검색", border: InputBorder.none),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

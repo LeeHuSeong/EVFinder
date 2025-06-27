@@ -1,98 +1,101 @@
 import 'package:flutter/material.dart';
+import '../../Model/ev_charger_model.dart';
 
 class ChargerDetailCard extends StatelessWidget {
-  const ChargerDetailCard({super.key});
+  final EvCharger charger;
+
+  const ChargerDetailCard({super.key, required this.charger});
 
   @override
   Widget build(BuildContext context) {
+    final chargerTypeText = _convertChargerType(charger.chgerType);
+    final chargerStateText = _convertStatusText(charger.stat);
+    final chargerStateColor = _convertStatusColor(charger.stat);
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Container(
         height: 200,
         width: MediaQuery.of(context).size.width - 25,
-        decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(15)),
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              /// 즐겨찾기 아이콘
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [Icon(Icons.star, color: Colors.grey)],
+                children: [Icon(Icons.star_border, color: Colors.grey)],
               ),
 
-              // Text(station, style: AppTextStyle.koPtBold16()),
-              // const SizedBox(height: 5),
-              // Text(address, style: AppTextStyle.koPtRegular14()),
-              const SizedBox(height: 25),
-              Padding(
-                padding: const EdgeInsets.all(1),
-                child: Container(
-                  decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(5)),
-                  width: MediaQuery.of(context).size.width,
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.only(left: 20), // 내용 영역 주변 여백 제거
-                    title: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center, // 텍스트 수직 정렬
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 15.0, // leading과 text 사이의 간격
-                              child: CircleAvatar(backgroundColor: Colors.white),
-                            ),
-                            const SizedBox(width: 5),
+              /// 충전소 이름
+              Text(
+                charger.name,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
 
-                            // Text(controller.chgerType(chargerType), style: AppTextStyle.koPtBold14()),
-                            // const SizedBox(width: 5),
-                            // Text(parkingFree, style: AppTextStyle.koPtBold12grey()),
+              /// 주소
+              const SizedBox(height: 5),
+              Text(
+                charger.addr,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+
+              const SizedBox(height: 25),
+
+              /// 상태 표시 영역
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F0F0),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                width: MediaQuery.of(context).size.width,
+                child: ListTile(
+                  contentPadding: const EdgeInsets.only(left: 20, right: 16),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      /// 왼쪽: 상태 아이콘 + 타입 텍스트
+                      Flexible(
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 6,
+                              backgroundColor: chargerStateColor,
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                chargerTypeText,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                charger.output,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                            ),
                           ],
                         ),
+                      ),
 
-                        // remainCharger != null
-                        //     ? Padding(
-                        //         padding: const EdgeInsets.only(right: 8.0),
-                        //         child: Container(
-                        //           height: 45,
-                        //           width: 45,
-                        //           decoration: BoxDecoration(color: AppColor.white, borderRadius: BorderRadius.circular(5)),
-                        //           child: Column(
-                        //             children: [
-                        //               const SizedBox(height: 3),
-                        //               const Text(
-                        //                 "충전가능",
-                        //                 style: TextStyle(fontFamily: 'PretendardRegular', fontSize: 10, color: AppColor.grey),
-                        //               ),
-                        //               const SizedBox(height: 3),
-                        //               Row(
-                        //                 mainAxisAlignment: MainAxisAlignment.center,
-                        //                 children: [
-                        //                   Text(
-                        //                     remainCharger!,
-                        //                     style: const TextStyle(fontFamily: 'PretendardRegular', fontSize: 15, fontWeight: FontWeight.bold, color: AppColor.primary),
-                        //                   ),
-                        //                   const Text(
-                        //                     "/",
-                        //                     style: TextStyle(fontFamily: 'PretendardRegular', fontSize: 15, fontWeight: FontWeight.bold, color: AppColor.black),
-                        //                   ),
-                        //                   Text(
-                        //                     totalCharger!,
-                        //                     style: const TextStyle(fontFamily: 'PretendardRegular', fontSize: 15, fontWeight: FontWeight.bold, color: AppColor.black),
-                        //                   ),
-                        //                 ],
-                        //               ),
-                        //             ],
-                        //           ),
-                        //         ),
-                        //       )
-                        //     : Padding(
-                        //         padding: const EdgeInsets.only(right: 16.0),
-                        //         child: ChargeChip(name: chargerState!, color: color!),
-                        //       ),
-                      ],
-                    ),
+                      /// 오른쪽: 충전 가능 수 (예시)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: const [
+                          Text("충전가능", style: TextStyle(fontSize: 10, color: Colors.grey)),
+                          Text("1/2", style: TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -102,4 +105,55 @@ class ChargerDetailCard extends StatelessWidget {
       ),
     );
   }
+
+/// 충전기 타입 코드 → 텍스트
+String _convertChargerType(String code) {
+  switch (code) {
+    case "01":
+      return "완속";
+    case "02":
+      return "급속";
+    case "03":
+      return "초급속";
+    case "06":
+      return "DC차데모";
+    case "07":
+      return "AC3상";
+    default:
+      return "기타";
+  }
+}
+
+/// 상태 코드 → 텍스트
+String _convertStatusText(int stat) {
+  switch (stat) {
+    case 1:
+      return "통신이상";
+    case 2:
+      return "충전대기";
+    case 3:
+      return "충전중";
+    case 4:
+      return "운영중지";
+    case 5:
+      return "점검중";
+    default:
+      return "상태미정";
+  }
+}
+
+/// 상태 코드 → 색상
+Color _convertStatusColor(int stat) {
+  switch (stat) {
+    case 2:
+      return Colors.green; // 충전 가능
+    case 3:
+      return Colors.orange; // 충전 중
+    case 4:
+    case 5:
+      return Colors.red; // 오류 상태
+    default:
+      return Colors.grey;
+  }
+}
 }

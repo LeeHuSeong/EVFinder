@@ -26,7 +26,7 @@ class _HomeViewState extends State<HomeView> {
 
               // 마커 준비
               final positions = MarkerService.getMarkerPositions();
-              _markers = MarkerService.generateMarkers(positions);
+              _markers = MarkerService.generateMarkers(positions, context);
               MarkerService.addMarkersToMap(_mapController, _markers);
             },
           ),

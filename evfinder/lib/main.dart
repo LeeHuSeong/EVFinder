@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'View/login_view.dart'; // 로그인 화면 import
+import 'view/station_list_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

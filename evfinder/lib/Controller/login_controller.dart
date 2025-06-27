@@ -9,6 +9,17 @@ class LoginController {
   final passwordController = TextEditingController();
   final UserModel _model = UserModel();
 
+
+  void success(BuildContext context, User user) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("로그인 성공: ${user.email}")),
+    );
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const MainView()), // 또는 MainView
+    );
+  }
+
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
@@ -32,10 +43,7 @@ class LoginController {
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("로그인 성공: ${user.email}")));
         //로그인 성공 후 화면 이동
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainView()), // HomeView는 실제 구현한 화면으로 바꾸세요
-        );
+        success(context, user);
       }
     } on FirebaseAuthException catch (e) {
       String message;
@@ -70,7 +78,7 @@ class LoginController {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) return; // 로그인 취소
 
-
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
@@ -79,8 +87,7 @@ class LoginController {
 
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google 로그인 성공: ${user.email}')));
-        // 로그인 성공 후 화면 이동 가능
-        // Navigator.pushReplacement(...);
+        success(context, user);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Google 로그인 실패: ${e.toString()}')));

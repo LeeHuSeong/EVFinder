@@ -1,5 +1,6 @@
 import 'package:evfinder/View/profile_view.dart';
 import 'package:evfinder/View/search_charger_view.dart';
+import 'package:evfinder/View/station_list_view.dart';
 import 'package:flutter/material.dart';
 
 import 'home_view.dart';
@@ -16,12 +17,14 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> pages = <Widget>[SearchChargerView(), HomeView(), ProfileView()];
+    List<Widget> pages = <Widget>[StationListView(), HomeView(), ProfileView()];
     return Scaffold(
-      appBar: AppBar(
-        title: Text("EVFinder"),
-        actions: selectedIndex == 2 ? [IconButton(onPressed: () {}, icon: Icon(Icons.settings))] : null,
-      ),
+      appBar: selectedIndex == 1
+          ? null
+          : AppBar(
+              title: Text("EVFinder"),
+              actions: selectedIndex == 2 ? [IconButton(onPressed: () {}, icon: Icon(Icons.settings))] : null,
+            ),
       //Navigation Bar
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),

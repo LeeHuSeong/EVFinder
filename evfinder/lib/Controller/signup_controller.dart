@@ -9,7 +9,7 @@ class SignupController {
   final confirmPasswordController = TextEditingController();
 
   final UserModel _userModel = UserModel();
-
+ 
   void dispose() {
     emailController.dispose();
     passwordController.dispose();

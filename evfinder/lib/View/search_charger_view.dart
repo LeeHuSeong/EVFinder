@@ -1,3 +1,4 @@
+import 'package:evfinder/View/widget/listtile_ChargerInfo_widget.dart';
 import 'package:flutter/material.dart';
 
 class SearchChargerView extends StatefulWidget {
@@ -42,12 +43,12 @@ class _SearchChargerViewState extends State<SearchChargerView> {
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.82,
               child: ListView.separated(
-                itemCount: 100,
+                itemCount: 2,
                 // primary: false,
                 physics: AlwaysScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
-                  return Text(index.toString());
+                  return ListtileChargerinfoWidget(chargerStat: index);
                 },
                 separatorBuilder: (BuildContext context, int index) => Divider(),
               ),

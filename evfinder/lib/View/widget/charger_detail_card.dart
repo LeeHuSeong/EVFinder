@@ -10,7 +10,7 @@ class ChargerDetailCard extends StatelessWidget {
       child: Container(
         height: 200,
         width: MediaQuery.of(context).size.width - 25,
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+        decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(15)),
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Column(

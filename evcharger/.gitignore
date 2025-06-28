@@ -33,4 +33,4 @@ build/
 .vscode/
 
 src/main/resources/*.properties
-src/main/resources/firebase/firebase-adminsdk.json
+src/main/resources/firebase/firebase-service-key.json

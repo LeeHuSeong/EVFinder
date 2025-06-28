@@ -4,8 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FirebaseLoginApplication {
+public class FirebaseLoginServerApplication {
+
     public static void main(String[] args) {
-        SpringApplication.run(FirebaseLoginApplication.class, args);
+        SpringApplication.run(FirebaseLoginServerApplication.class, args);
     }
 }

@@ -35,27 +35,28 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
         lng: lng,
       );
 
-      // 2. stat 갱신하기 (statId 기준 API 호출)
+      // 2. stat 갱신 및 정규화 (2, 3만 이용 가능으로 처리)
       final updatedFavorites = await Future.wait(rawFavorites.map((e) async {
         try {
           final stat = await FavoriteService.fetchStat(e['statId']);
-          e['stat'] = stat;
+          e['stat'] = (stat == 2 || stat == 3) ? 1 : 0; // ✅ 1: 가능, 0: 불가
         } catch (_) {
-          e['stat'] = -1;
+          e['stat'] = 0;
         }
         return e;
       }));
 
       // 3. 화면에 표시할 데이터로 변환
       setState(() {
+        print("🎯 즐겨찾기 개수: ${rawFavorites.length}");
         favoriteStations = updatedFavorites.map((e) {
           return {
             "name": e['name'],
             "addr": e['addr'],
             "useTime": e['useTime'],
-            "stat": e['stat'],
+            "stat": e['stat'], // 이미 1 또는 0으로 정규화됨
             "statId": e['statId'],
-            "distance": e['distance'],
+            "distance": '${e['distance']}km',
             "isFavorite": true,
           };
         }).toList();

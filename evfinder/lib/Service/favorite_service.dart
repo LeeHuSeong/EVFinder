@@ -66,8 +66,22 @@ class FavoriteService {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> json = jsonDecode(response.body);
-      return List<Map<String, dynamic>>.from(json['favorites']);
+      final body = jsonDecode(response.body);
+
+      // 1. 리스트 형태가 아닐 경우 방어
+      if (body is List) {
+        // 2. 각 요소가 Map이 되도록 캐스팅
+        return body.map<Map<String, dynamic>>((e) {
+          return {
+            ...e,
+            'distance': (e['distance'] ?? 0.0).toStringAsFixed(1),
+            // stat도 없는 경우, 기본값
+            'stat': e['stat'] ?? -1,
+          };
+        }).toList();
+      } else {
+        throw Exception('Unexpected response format (not a List)');
+      }
     } else {
       throw Exception('Failed to fetch updated favorite chargers');
     }

@@ -33,3 +33,4 @@ build/
 .vscode/
 
 src/main/resources/application.properties
+src/main/resources/evfinder-10135-firebase-adminsdk-fbsvc-1daa321fee.json

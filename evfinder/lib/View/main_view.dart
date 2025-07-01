@@ -3,6 +3,7 @@ import 'package:evfinder/View/search_charger_view.dart';
 import 'package:evfinder/View/setting_view.dart';
 import 'package:evfinder/View/station_list_view.dart';
 import 'package:flutter/material.dart';
+import 'package:evfinder/View/favorite_station_view.dart';
 
 import 'home_view.dart';
 
@@ -18,7 +19,7 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> pages = <Widget>[StationListView(), HomeView(), ProfileView()];
+    List<Widget> pages = <Widget>[FavoriteStationView(), HomeView(), ProfileView()];
     return Scaffold(
       appBar: selectedIndex == 1
           ? null

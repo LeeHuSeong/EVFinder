@@ -25,15 +25,28 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
     setState(() => isLoading = true);
 
     try {
-      const double lat = 37.5665; // 예시 위치: 서울 (GPS에서 실제 값 받아와도 됨)
+      const double lat = 37.5665;
       const double lng = 126.9780;
 
-      final updatedFavorites = await FavoriteService.fetchFavoritesWithStat(
+      // 1. DB에서 즐겨찾기 목록 가져오기
+      final rawFavorites = await FavoriteService.fetchFavoritesWithStat(
         userId: userId,
         lat: lat,
         lng: lng,
       );
 
+      // 2. stat 갱신하기 (statId 기준 API 호출)
+      final updatedFavorites = await Future.wait(rawFavorites.map((e) async {
+        try {
+          final stat = await FavoriteService.fetchStat(e['statId']);
+          e['stat'] = stat;
+        } catch (_) {
+          e['stat'] = -1;
+        }
+        return e;
+      }));
+
+      // 3. 화면에 표시할 데이터로 변환
       setState(() {
         favoriteStations = updatedFavorites.map((e) {
           return {
@@ -53,6 +66,7 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
       setState(() => isLoading = false);
     }
   }
+
 
 
   Future<void> toggleFavorite(int index) async {

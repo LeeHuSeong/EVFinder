@@ -42,8 +42,8 @@ class FavoriteService {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return List<Map<String, dynamic>>.from(data);
+      final Map<String, dynamic> json = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(json['favorites']);
     } else {
       throw Exception('Failed to fetch favorites');
     }
@@ -66,13 +66,24 @@ class FavoriteService {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return List<Map<String, dynamic>>.from(data);
+      final Map<String, dynamic> json = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(json['favorites']);
     } else {
       throw Exception('Failed to fetch updated favorite chargers');
     }
   }
 
+  static Future<int> fetchStat(String statId) async {
+    final url = Uri.parse('${ApiConstants.evApiBaseUrl}/stat?statId=$statId');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return int.tryParse(json['stat'].toString()) ?? -1;
+    } else {
+      throw Exception('Failed to fetch stat for $statId');
+    }
+  }
 
 
   static Future<List<String>> getFavoriteStatIds(String userId) async {
@@ -80,8 +91,9 @@ class FavoriteService {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((e) => e['statId'] as String).toList();
+      final Map<String, dynamic> json = jsonDecode(response.body);
+      final List<dynamic> favorites = json['favorites'];
+      return favorites.map((e) => e['statId'] as String).toList();
     } else {
       throw Exception('Failed to fetch favorite statIds');
     }

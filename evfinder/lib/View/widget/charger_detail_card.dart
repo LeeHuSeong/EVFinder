@@ -18,8 +18,28 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
   @override
   void initState() {
     super.initState();
-    checkFavoriteStatus();
+    _initializeChargerDetail();
   }
+
+  Future<void> refreshStat() async {
+    try {
+      final updatedStat = await FavoriteService.fetchStat(widget.charger.statId);
+      setState(() {
+        widget.charger.stat = updatedStat;
+      });
+    } catch (e) {
+      print("⚠️ stat 최신화 실패: $e");
+    }
+  }
+
+  /// 즐겨찾기 상태 확인 + stat 최신화 통합 함수
+  Future<void> _initializeChargerDetail() async {
+    await Future.wait([
+      checkFavoriteStatus(),
+      refreshStat(),
+    ]);
+  }
+
 
   Future<void> checkFavoriteStatus() async {
     try {

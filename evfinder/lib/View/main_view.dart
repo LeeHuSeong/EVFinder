@@ -18,9 +18,26 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> pages = <Widget>[StationListView(), HomeView(), ProfileView(), SettingView()];
+    List<Widget> pages = <Widget>[StationListView(), HomeView(), ProfileView()];
     return Scaffold(
-      appBar: selectedIndex == 1 ? null : AppBar(title: Text("EVFinder")),
+      appBar: selectedIndex == 1
+          ? null
+          : AppBar(
+              title: Text("EVFinder"),
+              actions: selectedIndex == 2
+                  ? [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SettingView()), // 또는 MainView
+                          );
+                        },
+                        icon: Icon(Icons.settings),
+                      ),
+                    ]
+                  : null,
+            ),
       //Navigation Bar
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
@@ -57,15 +74,6 @@ class _MainViewState extends State<MainView> {
                   },
                   icon: Icon(Icons.person, size: 25),
                   color: selectedIndex == 2 ? Colors.green : Colors.black12,
-                ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      selectedIndex = 3;
-                    });
-                  },
-                  icon: Icon(Icons.settings, size: 25),
-                  color: selectedIndex == 3 ? Colors.green : Colors.black12,
                 ),
               ],
             ),

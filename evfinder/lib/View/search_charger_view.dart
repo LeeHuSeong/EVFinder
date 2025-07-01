@@ -40,19 +40,23 @@ class _SearchChargerViewState extends State<SearchChargerView> {
                 ),
               ),
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.82,
-              child: ListView.separated(
-                itemCount: 2,
-                // primary: false,
-                physics: AlwaysScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListtileChargerinfoWidget(chargerStat: index);
-                },
-                separatorBuilder: (BuildContext context, int index) => Divider(),
-              ),
-            ),
+            // 검색창 listtile -> 검색 데이터가 아직 적용이 안되서 주석 처리 해놓음
+            // SizedBox(
+            //   height: MediaQuery
+            //       .of(context)
+            //       .size
+            //       .height * 0.75,
+            //   child: ListView.separated(
+            //     itemCount: 2,
+            //     // primary: false,
+            //     physics: AlwaysScrollableScrollPhysics(),
+            //     shrinkWrap: true,
+            //     itemBuilder: (BuildContext context, int index) {
+            //       return ListtileChargerinfoWidget(isCancelIconExist: true, stat:, name:, addr:);
+            //     },
+            //     separatorBuilder: (BuildContext context, int index) => Divider(),
+            //   ),
+            // ),
           ],
         ),
       ),

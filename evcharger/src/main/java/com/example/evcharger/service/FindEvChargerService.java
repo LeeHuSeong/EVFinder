@@ -71,6 +71,32 @@ public class FindEvChargerService {
 
 }
 
+    //즐겨찾기 검색을 위해 추가
+    public List<Map<String, Object>> getAllChargers() throws Exception {
+        String urlStr = "https://apis.data.go.kr/B552584/EvCharger/getChargerInfo?" +
+                "serviceKey=" + apiKey +
+                "&pageNo=1&numOfRows=9999&dataType=JSON";
+
+        HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
+        conn.setRequestMethod("GET");
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+        }
+        br.close();
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> jsonMap = mapper.readValue(sb.toString(), Map.class);
+        Map<String, Object> response = (Map<String, Object>) jsonMap.get("items");
+
+        List<Map<String, Object>> items = (List<Map<String, Object>>) response.get("item");
+        return items;
+    }
+
+
     private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
         final int R = 6371;
         double dLat = Math.toRadians(lat2 - lat1);

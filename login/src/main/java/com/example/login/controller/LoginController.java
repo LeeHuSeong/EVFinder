@@ -58,34 +58,42 @@ public class LoginController {
     }
 
     @PostMapping("/signup")
-public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
-    if (request.getEmail() == null || request.getEmail().isEmpty()) {
-        return ResponseEntity.badRequest().body("이메일을 입력해주세요.");
-    }
-    if (request.getPassword() == null || request.getPassword().length() < 6) {
-        return ResponseEntity.badRequest().body("비밀번호는 6자 이상이어야 합니다.");
-    }
-
-    try {
-        CreateRequest createRequest = new CreateRequest()
-                .setEmail(request.getEmail())
-                .setPassword(request.getPassword());
-
-        UserRecord userRecord = FirebaseAuth.getInstance().createUser(createRequest);
-
+    public ResponseEntity<Map<String, Object>> signup(@RequestBody SignupRequest request) {
         Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("uid", userRecord.getUid());
-        response.put("email", userRecord.getEmail());
 
-        return ResponseEntity.ok(response);
-    } catch (FirebaseAuthException e) {
-        if (e.getAuthErrorCode() != null &&
-            e.getAuthErrorCode().toString().equals("EMAIL_ALREADY_EXISTS")) {
-            return ResponseEntity.badRequest().body("이미 가입된 이메일입니다.");
+        if (request.getEmail() == null || request.getEmail().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "이메일을 입력해주세요.");
+            return ResponseEntity.badRequest().body(response);
         }
-        return ResponseEntity.badRequest().body("회원가입 실패: " + e.getMessage());
-    }
-}
 
+        if (request.getPassword() == null || request.getPassword().length() < 6) {
+            response.put("success", false);
+            response.put("message", "비밀번호는 6자 이상이어야 합니다.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+            CreateRequest createRequest = new CreateRequest()
+                    .setEmail(request.getEmail())
+                    .setPassword(request.getPassword());
+
+            UserRecord userRecord = FirebaseAuth.getInstance().createUser(createRequest);
+
+            response.put("success", true);
+            response.put("uid", userRecord.getUid());
+            response.put("email", userRecord.getEmail());
+            return ResponseEntity.ok(response);
+
+        } catch (FirebaseAuthException e) {
+            response.put("success", false);
+            if (e.getAuthErrorCode() != null &&
+                e.getAuthErrorCode().toString().equals("EMAIL_ALREADY_EXISTS")) {
+                response.put("message", "이미 가입된 이메일입니다.");
+            } else {
+                response.put("message", "회원가입 실패: " + e.getMessage());
+            }
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }

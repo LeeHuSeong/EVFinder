@@ -9,7 +9,7 @@ final String output;
 final String method;
 final String chgerType;
 final String busiNm;
-final int stat;
+int stat;
 final double distance;
 
 EvCharger({

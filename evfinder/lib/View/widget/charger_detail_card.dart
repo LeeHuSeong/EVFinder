@@ -1,19 +1,89 @@
 import 'package:flutter/material.dart';
 import '../../Model/ev_charger_model.dart';
+import 'package:evfinder/Service/favorite_service.dart';
 
-class ChargerDetailCard extends StatelessWidget {
+class ChargerDetailCard extends StatefulWidget {
   final EvCharger charger;
 
   const ChargerDetailCard({super.key, required this.charger});
 
   @override
+  State<ChargerDetailCard> createState() => _ChargerDetailCardState();
+}
+
+class _ChargerDetailCardState extends State<ChargerDetailCard> {
+  bool isFavorite = false;
+  final String userId = 'test_user'; // 나중에 SharedPreferences로 대체
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeChargerDetail();
+  }
+
+  Future<void> refreshStat() async {
+    try {
+      final updatedStat = await FavoriteService.fetchStat(widget.charger.statId);
+      setState(() {
+        widget.charger.stat = updatedStat;
+      });
+    } catch (e) {
+      print("⚠️ stat 최신화 실패: $e");
+    }
+  }
+
+  /// 즐겨찾기 상태 확인 + stat 최신화 통합 함수
+  Future<void> _initializeChargerDetail() async {
+    await Future.wait([
+      checkFavoriteStatus(),
+      refreshStat(),
+    ]);
+  }
+
+
+  Future<void> checkFavoriteStatus() async {
+    try {
+      final statIds = await FavoriteService.getFavoriteStatIds(userId);
+      setState(() {
+        isFavorite = statIds.contains(widget.charger.statId);
+      });
+    } catch (e) {
+      print("⚠️ 즐겨찾기 상태 확인 실패: $e");
+    }
+  }
+
+  Future<void> toggleFavorite() async {
+    if (isFavorite) {
+      final success = await FavoriteService.removeFavorite(userId, widget.charger.statId);
+      if (success) {
+        setState(() => isFavorite = false);
+        showSnackBar("즐겨찾기에서 제거되었습니다.");
+      } else {
+        showSnackBar("제거 실패");
+      }
+    } else {
+      final success = await FavoriteService.addFavorite(userId, widget.charger);
+      if (success) {
+        setState(() => isFavorite = true);
+        showSnackBar("즐겨찾기에 추가되었습니다.");
+      } else {
+        showSnackBar("추가 실패");
+      }
+    }
+  }
+
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final charger = widget.charger;
     final chargerTypeText = _convertChargerType(charger.chgerType);
-    final chargerStateText = _convertStatusText(charger.stat);
     final chargerStateColor = _convertStatusColor(charger.stat);
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Container(
         height: 200,
         width: MediaQuery.of(context).size.width - 25,
@@ -21,18 +91,17 @@ class ChargerDetailCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 상단: 이름, 주소, 즐겨찾기 버튼
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // 이름 + 주소
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      /// 충전소 이름
                       Text(charger.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-
-                      /// 주소
                       const SizedBox(height: 5),
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.75,
@@ -45,10 +114,14 @@ class ChargerDetailCard extends StatelessWidget {
                     ],
                   ),
 
-                  //즐겨찾기 아이콘
+                  // 즐겨찾기 아이콘
                   IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.star, color: Colors.yellow),
+
+                    onPressed: toggleFavorite,
+                    icon: Icon(
+                      isFavorite ? Icons.star : Icons.star_border,
+                      color: Colors.yellow,
+                    ),
                   ),
                 ],
               ),
@@ -56,7 +129,7 @@ class ChargerDetailCard extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            /// 상태 표시 영역
+            // 하단: 상태, 타입 등
             Container(
               decoration: BoxDecoration(color: const Color(0xFFF0F0F0), borderRadius: BorderRadius.circular(5)),
               width: MediaQuery.of(context).size.width,
@@ -65,7 +138,6 @@ class ChargerDetailCard extends StatelessWidget {
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    /// 왼쪽: 상태 아이콘 + 타입 텍스트
                     Flexible(
                       child: Row(
                         children: [
@@ -90,7 +162,7 @@ class ChargerDetailCard extends StatelessWidget {
                       ),
                     ),
 
-                    /// 오른쪽: 충전 가능 수 (예시)
+                    // 오른쪽 충전 가능 수
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: const [
@@ -108,54 +180,74 @@ class ChargerDetailCard extends StatelessWidget {
     );
   }
 
-/// 충전기 타입 코드 → 텍스트
-String _convertChargerType(String code) {
-  switch (code) {
-    case "01":
-      return "완속";
-    case "02":
-      return "급속";
-    case "03":
-      return "초급속";
-    case "06":
-      return "DC차데모";
-    case "07":
-      return "AC3상";
-    default:
-      return "기타";
-  }
-}
 
-/// 상태 코드 → 텍스트
-String _convertStatusText(int stat) {
-  switch (stat) {
-    case 1:
-      return "통신이상";
-    case 2:
-      return "충전대기";
-    case 3:
-      return "충전중";
-    case 4:
-      return "운영중지";
-    case 5:
-      return "점검중";
-    default:
-      return "상태미정";
+  /// 충전기 타입 코드 → 텍스트
+  String _convertChargerType(String code) {
+    switch (code) {
+      case "01":
+        return "완속";
+      case "02":
+        return "급속";
+      case "03":
+        return "초급속";
+      case "06":
+        return "DC차데모";
+      case "07":
+        return "AC3상";
+      default:
+        return "기타";
+    }
   }
-}
+
+  /// 상태 코드 → 텍스트
+  String _convertStatusText(int stat) {
+    switch (stat) {
+      case 1:
+        return "통신이상";
+      case 2:
+        return "충전대기";
+      case 3:
+        return "충전중";
+      case 4:
+        return "운영중지";
+      case 5:
+        return "점검중";
+      default:
+        return "상태미정";
+    }
+  }
+
 
   /// 상태 코드 → 색상
   Color _convertStatusColor(int stat) {
     switch (stat) {
       case 2:
-        return Colors.green; // 충전 가능
+        return Colors.green;
       case 3:
-        return Colors.orange; // 충전 중
+        return Colors.orange;
       case 4:
       case 5:
-        return Colors.red; // 오류 상태
+        return Colors.red;
       default:
         return Colors.grey;
+    }
+  }
+
+  /// 충전기 타입 코드 → 텍스트
+  String _convertChargerType(String code) {
+    switch (code) {
+      case "01":
+        return "완속";
+      case "02":
+        return "급속";
+      case "03":
+        return "초급속";
+      case "06":
+        return "DC차데모";
+      case "07":
+        return "AC3상";
+      default:
+        return "기타";
     }
   }
 }

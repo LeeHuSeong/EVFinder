@@ -2,6 +2,12 @@ package com.example.login.controller;
 
 import com.example.login.dto.LoginRequest;
 import com.example.login.dto.LoginResponse;
+import com.example.login.dto.SignupRequest;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
+import com.google.firebase.auth.UserRecord.CreateRequest;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -50,4 +56,36 @@ public class LoginController {
             return ResponseEntity.status(401).body(new LoginResponse(false, userMessage));
         }
     }
+
+    @PostMapping("/signup")
+public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
+    if (request.getEmail() == null || request.getEmail().isEmpty()) {
+        return ResponseEntity.badRequest().body("이메일을 입력해주세요.");
+    }
+    if (request.getPassword() == null || request.getPassword().length() < 6) {
+        return ResponseEntity.badRequest().body("비밀번호는 6자 이상이어야 합니다.");
+    }
+
+    try {
+        CreateRequest createRequest = new CreateRequest()
+                .setEmail(request.getEmail())
+                .setPassword(request.getPassword());
+
+        UserRecord userRecord = FirebaseAuth.getInstance().createUser(createRequest);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("uid", userRecord.getUid());
+        response.put("email", userRecord.getEmail());
+
+        return ResponseEntity.ok(response);
+    } catch (FirebaseAuthException e) {
+        if (e.getAuthErrorCode() != null &&
+            e.getAuthErrorCode().toString().equals("EMAIL_ALREADY_EXISTS")) {
+            return ResponseEntity.badRequest().body("이미 가입된 이메일입니다.");
+        }
+        return ResponseEntity.badRequest().body("회원가입 실패: " + e.getMessage());
+    }
+}
+
 }

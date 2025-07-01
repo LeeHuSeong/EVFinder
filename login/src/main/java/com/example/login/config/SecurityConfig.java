@@ -13,7 +13,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (API 서버용)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/login").permitAll()  // 로그인 API는 인증 없이 접근 허용
+                .requestMatchers("/api/login", "/api/signup").permitAll()  // 로그인 API는 인증 없이 접근 허용
                 .anyRequest().authenticated()               // 그 외는 인증 필요
             )
             .httpBasic(httpBasic -> httpBasic.disable())    // Basic Auth 비활성화

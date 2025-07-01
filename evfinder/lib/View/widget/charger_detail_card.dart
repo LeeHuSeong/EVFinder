@@ -83,7 +83,7 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
     final chargerStateColor = _convertStatusColor(charger.stat);
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Container(
         height: 200,
         width: MediaQuery.of(context).size.width - 25,
@@ -116,6 +116,7 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
 
                   // 즐겨찾기 아이콘
                   IconButton(
+
                     onPressed: toggleFavorite,
                     icon: Icon(
                       isFavorite ? Icons.star : Icons.star_border,
@@ -178,6 +179,44 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
       ),
     );
   }
+
+
+  /// 충전기 타입 코드 → 텍스트
+  String _convertChargerType(String code) {
+    switch (code) {
+      case "01":
+        return "완속";
+      case "02":
+        return "급속";
+      case "03":
+        return "초급속";
+      case "06":
+        return "DC차데모";
+      case "07":
+        return "AC3상";
+      default:
+        return "기타";
+    }
+  }
+
+  /// 상태 코드 → 텍스트
+  String _convertStatusText(int stat) {
+    switch (stat) {
+      case 1:
+        return "통신이상";
+      case 2:
+        return "충전대기";
+      case 3:
+        return "충전중";
+      case 4:
+        return "운영중지";
+      case 5:
+        return "점검중";
+      default:
+        return "상태미정";
+    }
+  }
+
 
   /// 상태 코드 → 색상
   Color _convertStatusColor(int stat) {

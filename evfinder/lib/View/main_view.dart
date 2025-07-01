@@ -45,7 +45,7 @@ class _MainViewState extends State<MainView> {
         child: Container(
           height: 10,
           child: Padding(
-            padding: const EdgeInsets.only(right: 50, left: 50),
+            padding: const EdgeInsets.only(right: 30, left: 30),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -55,8 +55,17 @@ class _MainViewState extends State<MainView> {
                       selectedIndex = 0;
                     });
                   },
-                  icon: Icon(Icons.star, size: 35),
+                  icon: Icon(Icons.star, size: 25),
                   color: selectedIndex == 0 ? Colors.green : Colors.black12,
+                ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedIndex = 1;
+                    });
+                  },
+                  icon: Icon(Icons.explore, size: 25),
+                  color: selectedIndex == 1 ? Colors.green : Colors.black12,
                 ),
                 IconButton(
                   onPressed: () {
@@ -64,7 +73,7 @@ class _MainViewState extends State<MainView> {
                       selectedIndex = 2;
                     });
                   },
-                  icon: Icon(Icons.person, size: 35),
+                  icon: Icon(Icons.person, size: 25),
                   color: selectedIndex == 2 ? Colors.green : Colors.black12,
                 ),
               ],
@@ -74,22 +83,22 @@ class _MainViewState extends State<MainView> {
       ),
 
       // 가운데 동그란 버튼
-      floatingActionButton: SizedBox(
-        height: 80,
-        width: 80,
-        child: FloatingActionButton(
-          clipBehavior: Clip.none,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-          onPressed: () {
-            setState(() {
-              selectedIndex = 1;
-            });
-          },
-          backgroundColor: selectedIndex == 1 ? Colors.green : Colors.grey,
-          child: Icon(Icons.map, size: 35),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: SizedBox(
+      //   height: 80,
+      //   width: 80,
+      //   child: FloatingActionButton(
+      //     clipBehavior: Clip.none,
+      //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+      //     onPressed: () {
+      //       setState(() {
+      //         selectedIndex = 1;
+      //       });
+      //     },
+      //     backgroundColor: selectedIndex == 1 ? Colors.green : Colors.grey,
+      //     child: Icon(Icons.map, size: 35),
+      //   ),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: pages[selectedIndex],
     );
   }

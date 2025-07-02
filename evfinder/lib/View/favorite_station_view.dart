@@ -39,7 +39,7 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
       final updatedFavorites = await Future.wait(rawFavorites.map((e) async {
         try {
           final stat = await FavoriteService.fetchStat(e['statId']);
-          e['stat'] = (stat == 2 || stat == 3) ? 1 : 0; // ✅ 1: 가능, 0: 불가
+          e['stat'] = (stat == 2 || stat == 3) ? 1 : 0; // 1: 가능, 0: 불가
         } catch (_) {
           e['stat'] = 0;
         }
@@ -48,7 +48,7 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
 
       // 3. 화면에 표시할 데이터로 변환
       setState(() {
-        print("🎯 즐겨찾기 개수: ${rawFavorites.length}");
+        print(" 즐겨찾기 개수: ${rawFavorites.length}");
         favoriteStations = updatedFavorites.map((e) {
           return {
             "name": e['name'],
@@ -63,7 +63,7 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
         isLoading = false;
       });
     } catch (e) {
-      print("❌ 즐겨찾기 목록 불러오기 실패: $e");
+      print(" 즐겨찾기 목록 불러오기 실패: $e");
       setState(() => isLoading = false);
     }
   }

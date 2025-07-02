@@ -35,7 +35,7 @@ class _HomeViewState extends State<HomeView> {
   /// 🔌 충전소 데이터 가져와서 마커 생성
   Future<void> _loadMarkers(List<EvCharger> chargers) async {
     try {
-      final markers = MarkerService.generateMarkers(chargers, context);
+      final markers = MarkerService.generateMarkers(chargers, context, _nMapController);
       setState(() {
         _markers = markers;
       });

@@ -59,37 +59,51 @@ class FavoriteService {
 
   static Future<List<Map<String, dynamic>>> fetchFavoritesWithStat({
     required String userId,
-    required double lat,
-    required double lng,
   }) async {
-    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/listWithStat?userId=$userId&lat=$lat&lng=$lng');
+    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/global/listWithStat?userId=$userId');
+
     final response = await http.get(url);
+    print('[DEBUG] 응답: ${response.body}');
 
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
 
-      // 1. 리스트 형태가 아닐 경우 방어
-      if (body is List) {
-        // 2. 각 요소가 Map이 되도록 캐스팅
-        return body.map<Map<String, dynamic>>((e) {
+      if (body is Map<String, dynamic> && body.containsKey('favorites')) {
+        final list = List<Map<String, dynamic>>.from(body['favorites']);
+
+        return list.map((e) {
+          final rawDistance = e['distance'];
+          final parsedDistance = (rawDistance is num)
+              ? rawDistance
+              : double.tryParse(rawDistance.toString()) ?? 0.0;
+
+          final rawStat = e['stat'];
+          final parsedStat = (rawStat is int)
+              ? rawStat
+              : int.tryParse(rawStat.toString()) ?? -1;
+
           return {
             ...e,
-            'distance': (e['distance'] ?? 0.0).toStringAsFixed(1),
-            // stat도 없는 경우, 기본값
-            'stat': e['stat'] ?? -1,
+            'distance': parsedDistance.toStringAsFixed(1),
+            'stat': parsedStat,
           };
         }).toList();
       } else {
-        throw Exception('Unexpected response format (not a List)');
+        throw Exception('Unexpected response format');
       }
     } else {
       throw Exception('Failed to fetch updated favorite chargers');
     }
   }
 
+
+  //없애도 될 것 같기도.
   static Future<int> fetchStat(String statId) async {
     final url = Uri.parse('${ApiConstants.evApiBaseUrl}/stat?statId=$statId');
     final response = await http.get(url);
+
+    print('[DEBUG] 요청 URL: $url');
+    print('[DEBUG] 응답: ${response.body}');
 
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
@@ -111,5 +125,24 @@ class FavoriteService {
     } else {
       throw Exception('Failed to fetch favorite statIds');
     }
+  }
+
+  // 없애도 될 것 같기도 2
+  static Future<bool> updateStat(String userId, String statId, int stat) async {
+    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/updateStat');
+
+    final body = {
+      "userId": userId,
+      "statId": statId,
+      "stat": stat,
+    };
+
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(body),
+    );
+
+    return response.statusCode == 200;
   }
 }

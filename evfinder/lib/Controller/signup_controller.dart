@@ -2,7 +2,7 @@ import 'package:evfinder/View/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../Model/user_model.dart';
-
+import '../Service/SingupService.dart';
 class SignupController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -63,45 +63,30 @@ class SignupController {
   }
 
   Future<void> signUp(BuildContext context) async {
-    if (!_validateInput(context)) return;
+  if (!_validateInput(context)) return;
 
-    final email = emailController.text.trim();
-    final password = passwordController.text;
+  final email = emailController.text.trim();
+  final password = passwordController.text;
 
-    try {
-      final user = await _userModel.signUp(email, password);
+  try {
+    final result = await SignupService.signup(email, password);
 
-      if (!context.mounted) return;
+    if (!context.mounted) return;
 
-      if (user != null) {
-        _showMessage(context, '회원가입 성공: ${user.email}');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginView()),
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      if (!context.mounted) return;
-
-      String errorMessage;
-      switch (e.code) {
-        case 'email-already-in-use':
-          errorMessage = '이미 등록된 이메일입니다.';
-          break;
-        case 'invalid-email':
-          errorMessage = '유효하지 않은 이메일 형식입니다.';
-          break;
-        case 'weak-password':
-          errorMessage = '비밀번호가 너무 약합니다.';
-          break;
-        default:
-          errorMessage = '회원가입 실패: ${e.message}';
-      }
-
-      _showMessage(context, errorMessage);
-    } catch (e) {
-      if (!context.mounted) return;
-      _showMessage(context, '알 수 없는 오류가 발생했습니다.');
+    if (result['success'] == true) {
+      _showMessage(context, '회원가입 성공: ${result['email']}');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginView()),
+      );
+    } else {
+      _showMessage(context, result['message']); // 실패 시 서버가 준 메시지 출력
     }
+  } catch (e) {
+    if (!context.mounted) return;
+
+    _showMessage(context, '서버 오류가 발생했습니다.');
   }
+}
+
 }

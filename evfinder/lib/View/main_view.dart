@@ -21,24 +21,22 @@ class _MainViewState extends State<MainView> {
   Widget build(BuildContext context) {
     List<Widget> pages = <Widget>[FavoriteStationView(), HomeView(), ProfileView()];
     return Scaffold(
-      appBar: selectedIndex == 1
-          ? null
-          : AppBar(
+      appBar: selectedIndex == 2
+          ? AppBar(
               title: Text("EVFinder"),
-              actions: selectedIndex == 2
-                  ? [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const SettingView()), // 또는 MainView
-                          );
-                        },
-                        icon: Icon(Icons.settings),
-                      ),
-                    ]
-                  : null,
-            ),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SettingView()), // 또는 MainView
+                    );
+                  },
+                  icon: Icon(Icons.settings),
+                ),
+              ],
+            )
+          : null,
       //Navigation Bar
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),

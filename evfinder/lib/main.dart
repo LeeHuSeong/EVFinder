@@ -32,7 +32,8 @@ class MyApp extends StatelessWidget {
       title: 'EVFinder',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.green), useMaterial3: true),
       home: const LoginView(), // 로그인 화면이 처음 뜨도록
-      // home: const StationListView() //데이터베이스 연결 확인용
+      //home: const StationListView() //데이터베이스 연결 확인용
+
     );
   }
 }

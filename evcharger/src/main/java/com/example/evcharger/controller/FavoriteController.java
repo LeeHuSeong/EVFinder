@@ -1,6 +1,5 @@
 package com.example.evcharger.controller;
 
-import com.example.evcharger.service.FavoriteStatusService;
 import com.google.cloud.firestore.Firestore;
 
 import java.util.ArrayList;
@@ -28,15 +27,9 @@ public class FavoriteController {
     private FavoriteService favoriteService;
 
     @Autowired
-    private FavoriteStatusService favoriteStatusService;
-
-    //로그
-    private static final Logger log = LoggerFactory.getLogger(FavoriteController.class);
-
-
-    //테스트를 위한 추가
-    @Autowired
     private Firestore firestore;
+
+    private static final Logger log = LoggerFactory.getLogger(FavoriteController.class);
 
     @PostMapping("/add")
     public ApiResponse addFavorite(@RequestBody Map<String, Object> request) {
@@ -45,12 +38,12 @@ public class FavoriteController {
         return favoriteService.addFavorite(userId, station);
     }
 
-    @GetMapping("/listWithStat")
-    public List<Map<String, Object>> getFavoritesWithUpdatedStat(
-            @RequestParam String userId,
-            @RequestParam double lat,
-            @RequestParam double lng) {
-        return favoriteStatusService.getFavoritesWithUpdatedStat(userId, lat, lng);
+    @PostMapping("/updateStat")
+    public ApiResponse updateStat(@RequestBody Map<String, Object> request) {
+        String userId = (String) request.get("userId");
+        String statId = (String) request.get("statId");
+        int stat = (int) request.get("stat");
+        return favoriteService.updateStat(userId, statId, stat);
     }
 
     @DeleteMapping("/remove")
@@ -59,11 +52,9 @@ public class FavoriteController {
             @RequestParam String statId) {
         log.info("DELETE 요청 수신 - userId: {}, statId: {}", userId, statId);
         ApiResponse result = favoriteService.removeFavorite(userId, statId);
-        
         return ResponseEntity.ok(result);
     }
 
-    //테스트를 위함
     @GetMapping("/test")
     public ResponseEntity<?> testFavorites(@RequestParam String userId) {
         try {

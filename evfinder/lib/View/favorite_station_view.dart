@@ -95,10 +95,6 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
     return Scaffold(
       appBar: AppBar(
         title: Text('즐겨찾기 충전소'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../Model/Customuser.dart';
 
 class LoginService {
-  static const String baseUrl = 'http://100.100.100.58:8081/api';
+  static const String baseUrl = 'http://114.70.216.84:8081/api';
 
   static Future<CustomUser?> login(String email, String password) async {
   final url = Uri.parse('$baseUrl/login');

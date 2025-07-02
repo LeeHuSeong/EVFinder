@@ -21,6 +21,7 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
     _initializeChargerDetail();
   }
 
+  //stat만 불러옴(1,2,3)등의 값
   Future<void> refreshStat() async {
     try {
       final updatedStat = await FavoriteService.fetchStat(widget.charger.statId);
@@ -48,7 +49,7 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
         isFavorite = statIds.contains(widget.charger.statId);
       });
     } catch (e) {
-      print("⚠️ 즐겨찾기 상태 확인 실패: $e");
+      print("즐겨찾기 상태 확인 실패: $e");
     }
   }
 

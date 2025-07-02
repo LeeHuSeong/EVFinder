@@ -45,6 +45,7 @@ public class FavoriteService {
         }
     }
 
+    //삭제시 로그 추가
     public ApiResponse removeFavorite(String userId, String statId) {
         try {
             DocumentReference docRef = firestore
@@ -52,10 +53,15 @@ public class FavoriteService {
                     .document(userId)
                     .collection("favorites")
                     .document(statId);
+            
+            System.out.println("[삭제 시도] userId = " + userId + ", statId = " + statId);
+            System.out.println("[Firestore 경로] " + docRef.getPath());
 
             docRef.delete().get();  // 동기
+
             return new ApiResponse("success", "Deleted " + statId);
         } catch (Exception e) {
+            System.err.println("[삭제 오류] " + e.getMessage());
             return new ApiResponse("error", e.getMessage());
         }
     }

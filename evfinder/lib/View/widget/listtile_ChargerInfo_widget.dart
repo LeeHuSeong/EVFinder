@@ -51,7 +51,8 @@ class ListtileChargerinfoWidget extends StatefulWidget {
 // }
 
 class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
-  late MapCameraController cameraController;
+  static MapCameraController cameraController = MapCameraController();
+
   @override
   Widget build(BuildContext context) {
     //검색창 및 슬라이딩 박스에 있는 listtile 하나

@@ -250,7 +250,9 @@ class _SignupViewState extends State<SignupView> {
                 
                       // 회원가입 버튼
                       ElevatedButton(
-                        onPressed: _isLoading ? null : _handleSignup,
+                        onPressed: () {
+                          _controller.signUp(context);
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF10B981), // emerald-500
                           foregroundColor: Colors.white,

@@ -16,6 +16,10 @@ import com.example.evcharger.model.ApiResponse;
 import java.util.Map;
 import com.example.evcharger.model.ApiResponse;
 
+//로그
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 @RequestMapping("/api/favorite")
 public class FavoriteController {
@@ -25,6 +29,10 @@ public class FavoriteController {
 
     @Autowired
     private FavoriteStatusService favoriteStatusService;
+
+    //로그
+    private static final Logger log = LoggerFactory.getLogger(FavoriteController.class);
+
 
     //테스트를 위한 추가
     @Autowired
@@ -43,6 +51,16 @@ public class FavoriteController {
             @RequestParam double lat,
             @RequestParam double lng) {
         return favoriteStatusService.getFavoritesWithUpdatedStat(userId, lat, lng);
+    }
+
+    @DeleteMapping("/remove")
+    public ResponseEntity<ApiResponse> removeFavorite(
+            @RequestParam String userId,
+            @RequestParam String statId) {
+        log.info("DELETE 요청 수신 - userId: {}, statId: {}", userId, statId);
+        ApiResponse result = favoriteService.removeFavorite(userId, statId);
+        
+        return ResponseEntity.ok(result);
     }
 
     //테스트를 위함

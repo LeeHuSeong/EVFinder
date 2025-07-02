@@ -75,8 +75,6 @@ class FavoriteService {
           return {
             ...e,
             'distance': (e['distance'] ?? 0.0).toStringAsFixed(1),
-            // stat도 없는 경우, 기본값
-            'stat': e['stat'] ?? -1,
           };
         }).toList();
       } else {

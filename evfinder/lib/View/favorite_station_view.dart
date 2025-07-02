@@ -39,9 +39,9 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
       final updatedFavorites = await Future.wait(rawFavorites.map((e) async {
         try {
           final stat = await FavoriteService.fetchStat(e['statId']);
-          e['stat'] = (stat == 2 || stat == 3) ? 1 : 0; // 1: 가능, 0: 불가
+          e['stat'] = stat; // 정규화 없이 그대로 전달
         } catch (_) {
-          e['stat'] = 0;
+          e['stat'] = 0; // 실패 시 알 수 없음
         }
         return e;
       }));
@@ -54,7 +54,7 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
             "name": e['name'],
             "addr": e['addr'],
             "useTime": e['useTime'],
-            "stat": e['stat'], // 이미 1 또는 0으로 정규화됨
+            "stat": e['stat'],
             "statId": e['statId'],
             "distance": '${e['distance']}km',
             "isFavorite": true,

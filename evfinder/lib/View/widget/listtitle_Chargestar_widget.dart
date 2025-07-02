@@ -118,26 +118,22 @@ class _ListtileChargestarWidgetState extends State<ListtileChargestarWidget>
                             ),
                           ),
                           const SizedBox(width: 8),
-                          // 상태 배지
+                          // 상태 배지 (getStatusLabel & getStatusColor 기반)
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: widget.chargerStat == 1
-                                  ? const Color(0xFFDCFCE7)
-                                  : const Color(0xFFFEE2E2),
+                              color: getStatusColor(widget.chargerStat).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              widget.chargerStat == 1 ? '이용가능' : '이용불가',
+                              getStatusLabel(widget.chargerStat),
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
-                                color: widget.chargerStat == 1
-                                    ? const Color(0xFF059669)
-                                    : const Color(0xFFDC2626),
+                                color: getStatusColor(widget.chargerStat),
                               ),
                             ),
                           ),
@@ -234,5 +230,30 @@ class _ListtileChargestarWidgetState extends State<ListtileChargestarWidget>
         ),
       ),
     );
+  }
+}
+
+String getStatusLabel(int stat) {
+  switch (stat) {
+    case 0: return '알수없음';
+    case 1: return '통신이상';
+    case 2: return '이용가능';
+    case 3: return '충전중';
+    case 4: return '운영중지';
+    case 5: return '점검중';
+    default: return '알수없음';
+  }
+}
+
+Color getStatusColor(int stat) {
+  switch (stat) {
+    case 2:
+      return const Color(0xFF059669); // 초록
+    case 3:
+      return const Color(0xFF2563EB); // 파랑 (충전중)
+    case 5:
+      return const Color(0xFFDC2626); // 빨강 (점검)
+    default:
+      return const Color(0xFF9CA3AF); // 회색
   }
 }

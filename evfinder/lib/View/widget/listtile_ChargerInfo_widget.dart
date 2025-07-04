@@ -1,5 +1,6 @@
 import 'package:evfinder/Controller/map_camera_controller.dart';
 import 'package:evfinder/View/widget/slidingUp_Panel_widget.dart';
+import 'package:evfinder/Service/favorite_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_sliding_box/flutter_sliding_box.dart';
@@ -35,6 +36,24 @@ class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
     //검색창 및 슬라이딩 박스에 있는 listtile 하나
     return GestureDetector(
       onTap: widget.onTap,
+
+      onTap: () async {
+        widget.boxController.closeBox();
+        cameraController.moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
+        // moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
+
+        final statIds = await FavoriteService.getFavoriteStatIds('test_user');
+        final isFavorite = statIds.contains(widget.charger.statId);
+
+        showModalBottomSheet(
+          context: context,
+          builder: (_) => ChargerDetailCard(
+            charger: widget.charger,
+            isFavorite: isFavorite,
+          ),
+        );
+      },
+
       child: Padding(
         padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
         child: SizedBox(

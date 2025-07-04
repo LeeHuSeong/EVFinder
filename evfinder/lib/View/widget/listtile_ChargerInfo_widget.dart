@@ -37,22 +37,22 @@ class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
     return GestureDetector(
       onTap: widget.onTap,
 
-      onTap: () async {
-        widget.boxController.closeBox();
-        cameraController.moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
-        // moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
-
-        final statIds = await FavoriteService.getFavoriteStatIds('test_user');
-        final isFavorite = statIds.contains(widget.charger.statId);
-
-        showModalBottomSheet(
-          context: context,
-          builder: (_) => ChargerDetailCard(
-            charger: widget.charger,
-            isFavorite: isFavorite,
-          ),
-        );
-      },
+      // onTap: () async {
+      //   widget.boxController.closeBox();
+      //   cameraController.moveCameraPosition(widget.lat, widget.lng, widget.nMapController);
+      //   // moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
+      //
+      //   final statIds = await FavoriteService.getFavoriteStatIds('test_user');
+      //   final isFavorite = statIds.contains(widget.charger.statId);
+      //
+      //   showModalBottomSheet(
+      //     context: context,
+      //     builder: (_) => ChargerDetailCard(
+      //       charger: widget.charger,
+      //       isFavorite: isFavorite,
+      //     ),
+      //   );
+      // },
 
       child: Padding(
         padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),

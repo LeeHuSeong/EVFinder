@@ -16,6 +16,8 @@ public class EvChargerController {
 
     @Autowired
     private EvChargerService evChargerService;
+    
+    private FindEvChargerService chargerService;
 
     @Autowired
     private FindEvChargerService findEvChargerService;
@@ -67,4 +69,13 @@ public class EvChargerController {
         }
     }
 
+    @GetMapping("/stat")
+    public ResponseEntity<?> getStatByStatId(@RequestParam String statId) {
+        try {
+            int stat = findEvChargerService.getStatByStatId(statId);
+            return ResponseEntity.ok(Map.of("stat", stat));  // ← 여기를 Map으로 감싸기
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(Map.of("error", "Stat not found for statId: " + statId));
+        }
+    }
 }

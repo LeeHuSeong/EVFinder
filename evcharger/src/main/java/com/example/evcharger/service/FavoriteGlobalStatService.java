@@ -1,14 +1,9 @@
 package com.example.evcharger.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.firestore.Firestore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 
 @Service
@@ -20,54 +15,77 @@ public class FavoriteGlobalStatService {
     @Autowired
     private FindEvChargerService findEvChargerService;
 
-    public List<Map<String, Object>> getUpdatedFavorites(String userId) throws Exception {
-        List<Map<String, Object>> updatedFavorites = new ArrayList<>();
+    public List<Map<String, Object>> getUpdatedFavorites(String userId, double userLat, double userLng) throws Exception {
+    List<Map<String, Object>> updatedFavorites = new ArrayList<>();
 
-        // 1. Firestore 즐겨찾기 문서 가져오기
-        var collection = firestore.collection("users").document(userId).collection("favorites");
-        var docs = collection.get().get().getDocuments();
+    var collection = firestore.collection("users").document(userId).collection("favorites");
+    var docs = collection.get().get().getDocuments();
 
-        // 2. 공공 API 전체 충전소 목록 (stat 갱신용)
-        List<Map<String, Object>> allChargers = findEvChargerService.getAllChargers();
+    for (var doc : docs) {
+        Map<String, Object> favoriteData = doc.getData() != null ? new HashMap<>(doc.getData()) : new HashMap<>();
+        String statId = doc.getId();
+        favoriteData.put("statId", statId);
 
-        // 3. 문서 순회
-        for (var doc : docs) {
-            Map<String, Object> favoriteData = doc.getData(); // Firestore 저장된 정보
-            String statId = (String) favoriteData.get("statId");
+        Object latObj = favoriteData.get("lat");
+        Object lngObj = favoriteData.get("lng");
 
-            // 4. 공공 API에서 동일 statId 찾아 stat 값만 갱신
-            Optional<Map<String, Object>> matchedCharger = allChargers.stream()
-                .filter(ch -> statId.equals(ch.get("statId")))
-                .findFirst();
-
-            if (matchedCharger.isPresent()) {
-                Object newStat = matchedCharger.get().get("stat");
-                favoriteData.put("stat", newStat); // 기존 데이터에 최신 stat 덮어쓰기
-            } else {
-                favoriteData.put("stat", -1); // 못 찾았을 경우 -1 (또는 null)
-            }
-
+        if (latObj == null || lngObj == null) {
+            favoriteData.put("stat", -1);
             updatedFavorites.add(favoriteData);
+            continue;
         }
 
-        return updatedFavorites;
-    }
+        double chargerLat = Double.parseDouble(latObj.toString());
+        double chargerLng = Double.parseDouble(lngObj.toString());
 
-    // Firestore에서 사용자 즐겨찾기 statId 목록 가져오기
-    private List<String> getUserFavoriteStatIds(String userId) throws Exception {
-        List<String> statIds = new ArrayList<>();
-        var collection = firestore.collection("users").document(userId).collection("favorites");
-        var docs = collection.get().get().getDocuments();
+        // 👉 여기서 사용자의 위치를 기준으로 거리 계산
+        double distance = calculateDistance(userLat, userLng, chargerLat, chargerLng);
+        favoriteData.put("distance", distance);
 
-        //디버깅용
-        System.out.println("즐겨찾기 문서 수: " + docs.size());
+        // 📌 기존대로 상태 및 주소도 갱신
+        List<Map<String, Object>> nearby = findEvChargerService.getChargersBySidoCode(
+            getSidoCodeFromFirestore(favoriteData),
+            chargerLat, chargerLng
+        );
 
-        for (var doc : docs) {
-            System.out.println("즐겨찾기 statId: " + doc.getId());
-            statIds.add(doc.getId()); // 문서 ID가 statId임
+        Optional<Map<String, Object>> matched = nearby.stream()
+            .filter(c -> statId.equals(c.get("statId")))
+            .findFirst();
+
+        if (matched.isPresent()) {
+            Map<String, Object> charger = matched.get();
+            favoriteData.put("stat", charger.get("stat"));
+            favoriteData.put("name", charger.get("name"));
+            favoriteData.put("addr", charger.get("addr"));
+        } else {
+            favoriteData.put("stat", -1);
         }
 
-        return statIds;
+        updatedFavorites.add(favoriteData);
     }
+
+    return updatedFavorites.stream()
+            .sorted(Comparator.comparingDouble(f -> (Double) f.get("distance")))
+            .limit(30)
+            .toList();
 }
 
+    // Firestore에 저장된 sidoCode가 없다면 기본값 반환
+    private String getSidoCodeFromFirestore(Map<String, Object> favoriteData) {
+        Object sidoCode = favoriteData.get("sidoCode");
+        return sidoCode != null ? sidoCode.toString() : "11"; // default: 서울
+    }
+
+    private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
+        final int R = 6371;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                 * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+}

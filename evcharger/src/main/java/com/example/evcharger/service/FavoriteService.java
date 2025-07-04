@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import com.google.cloud.firestore.SetOptions;
 
 
 @Service
@@ -37,7 +38,7 @@ public class FavoriteService {
                     .collection("favorites")
                     .document(statId);
 
-            docRef.set(stationData).get(); // 덮어쓰기 방식
+            docRef.set(stationData, SetOptions.merge()).get();
             return new ApiResponse("success", "Added/Updated " + statId);
         }
         catch (Exception e) {
@@ -88,4 +89,20 @@ public class FavoriteService {
         }
     }
 
+    
+    //stat업데이트 해주기.
+    public ApiResponse updateStat(String userId, String statId, int stat) {
+    try {
+        DocumentReference docRef = firestore
+            .collection("users")
+            .document(userId)
+            .collection("favorites")
+            .document(statId);
+
+        docRef.update("stat", stat).get(); // stat 필드만 갱신
+        return new ApiResponse("success", "Updated stat for " + statId);
+    } catch (Exception e) {
+        return new ApiResponse("error", e.getMessage());
+    }
+}
 }

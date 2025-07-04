@@ -4,21 +4,34 @@ import 'package:evfinder/Service/favorite_service.dart';
 
 class ChargerDetailCard extends StatefulWidget {
   final EvCharger charger;
+  final bool isFavorite;
+  final VoidCallback? onFavoriteToggle;
 
-  const ChargerDetailCard({super.key, required this.charger});
+  const ChargerDetailCard({
+    super.key,
+    required this.charger,
+    required this.isFavorite,
+    this.onFavoriteToggle,
+  });
 
   @override
   State<ChargerDetailCard> createState() => _ChargerDetailCardState();
 }
 
+//충전 상태 보여주기 위함 함수
+String _getAvailabilityText(int stat) {
+  return stat == 2 ? '1/1' : '0/1';
+}
+
 class _ChargerDetailCardState extends State<ChargerDetailCard> {
-  bool isFavorite = false;
+  late bool isFavorite = false;
   final String userId = 'test_user'; // 나중에 SharedPreferences로 대체
 
   @override
   void initState() {
     super.initState();
-    _initializeChargerDetail();
+    isFavorite = widget.isFavorite;
+    refreshStat();
   }
 
   //stat만 불러옴(1,2,3)등의 값
@@ -30,26 +43,6 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
       });
     } catch (e) {
       print("⚠️ stat 최신화 실패: $e");
-    }
-  }
-
-  /// 즐겨찾기 상태 확인 + stat 최신화 통합 함수
-  Future<void> _initializeChargerDetail() async {
-    await Future.wait([
-      checkFavoriteStatus(),
-      refreshStat(),
-    ]);
-  }
-
-
-  Future<void> checkFavoriteStatus() async {
-    try {
-      final statIds = await FavoriteService.getFavoriteStatIds(userId);
-      setState(() {
-        isFavorite = statIds.contains(widget.charger.statId);
-      });
-    } catch (e) {
-      print("즐겨찾기 상태 확인 실패: $e");
     }
   }
 
@@ -117,7 +110,6 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
 
                   // 즐겨찾기 아이콘
                   IconButton(
-
                     onPressed: toggleFavorite,
                     icon: Icon(
                       isFavorite ? Icons.star : Icons.star_border,
@@ -164,11 +156,12 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
                     ),
 
                     // 오른쪽 충전 가능 수
+                    //Stat값에 따라 텍스트 설정
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: const [
+                      children: [
                         Text("충전가능", style: TextStyle(fontSize: 10, color: Colors.grey)),
-                        Text("1/2", style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(_getAvailabilityText(charger.stat), style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ],
@@ -233,5 +226,4 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
         return Colors.grey;
     }
   }
-
 }

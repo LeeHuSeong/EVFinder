@@ -71,30 +71,35 @@ public class FindEvChargerService {
 
 }
 
-    //즐겨찾기 검색을 위해 추가
-    public List<Map<String, Object>> getAllChargers() throws Exception {
-        String urlStr = "https://apis.data.go.kr/B552584/EvCharger/getChargerInfo?" +
-                "serviceKey=" + apiKey +
-                "&pageNo=1&numOfRows=9999&dataType=JSON";
+ 
+    public int getStatByStatId(String statId) {
+    try {
+        // 기본 서울 기준, 전역 탐색 안 하도록 일부 반경 내만 조회
+        String defaultSidoCode = "11";
+        double defaultLat = 37.5665;
+        double defaultLng = 126.9780;
 
-        HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
-        conn.setRequestMethod("GET");
+        List<Map<String, Object>> chargers = getChargersBySidoCode(defaultSidoCode, defaultLat, defaultLng);
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
+        for (Map<String, Object> charger : chargers) {
+            Object id = charger.get("statId");
+            if (id != null && statId.equals(id.toString())) {
+                Object stat = charger.get("stat");
+                if (stat instanceof Integer) return (int) stat;
+                if (stat instanceof String) return Integer.parseInt((String) stat);
+                throw new RuntimeException("알 수 없는 stat 형식: " + stat.getClass());
+            }
         }
-        br.close();
 
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> jsonMap = mapper.readValue(sb.toString(), Map.class);
-        Map<String, Object> response = (Map<String, Object>) jsonMap.get("items");
+        throw new RuntimeException("statId에 해당하는 충전소를 찾을 수 없습니다: " + statId);
 
-        List<Map<String, Object>> items = (List<Map<String, Object>>) response.get("item");
-        return items;
+    } catch (Exception e) {
+        System.err.println("[ERROR] getStatByStatId 실패: " + e.getMessage());
+        throw new RuntimeException("충전소 상태 조회 실패", e);
     }
+}
+
+
 
 
     private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {

@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:evfinder/View/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../Model/user_model.dart';
-import '../Service/SingupService.dart';
+import 'package:http/http.dart' as http;
+import '../Controller/login_controller.dart';
+
 class SignupController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final loginController = LoginController();
 
   final UserModel _userModel = UserModel();
  
@@ -62,30 +67,45 @@ class SignupController {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> signUp(BuildContext context) async {
-  if (!_validateInput(context)) return;
-
+  Future<void> signup(BuildContext context) async {
   final email = emailController.text.trim();
   final password = passwordController.text;
 
   try {
-    final result = await SignupService.signup(email, password);
+    final response = await http.post(
+      Uri.parse('http://100.100.100.63:8081/auth/signup'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
 
-    if (!context.mounted) return;
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
 
-    if (result['success'] == true) {
-      _showMessage(context, '회원가입 성공: ${result['email']}');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginView()),
-      );
+      if (decoded['success'] == true) {
+        final String jwt = decoded['jwt'];
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('회원가입 성공')),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginView()), // 직접 로그인 화면으로 이동
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('회원가입 실패: ${decoded['message']}')),
+        );
+      }
     } else {
-      _showMessage(context, result['message']); // 실패 시 서버가 준 메시지 출력
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('서버 오류가 발생했습니다.')),
+      );
     }
   } catch (e) {
-    if (!context.mounted) return;
-
-    _showMessage(context, '서버 오류가 발생했습니다.');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('회원가입 실패: ${e.toString()}')),
+    );
   }
 }
 

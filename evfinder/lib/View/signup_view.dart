@@ -19,11 +19,10 @@ class _SignupViewState extends State<SignupView> {
   }
 
   Future<void> _handleSignup() async {
+    _controller.signup(context);
     setState(() {
       _isLoading = true;
     });
-
-    await _controller.signUp(context);
 
     await Future.delayed(const Duration(seconds: 1)); // React 스타일 대기
 
@@ -250,9 +249,7 @@ class _SignupViewState extends State<SignupView> {
                 
                       // 회원가입 버튼
                       ElevatedButton(
-                        onPressed: () {
-                          _controller.signUp(context);
-                        },
+                         onPressed: _handleSignup,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF10B981), // emerald-500
                           foregroundColor: Colors.white,

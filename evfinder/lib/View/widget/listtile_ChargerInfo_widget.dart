@@ -15,70 +15,50 @@ class ListtileChargerinfoWidget extends StatefulWidget {
     required this.name,
     required this.addr,
     required this.stat,
-    required this.lat,
-    required this.lng,
-    required this.nMapController,
-    required this.boxController,
-    required this.charger,
+    required this.onTap,
+    required this.isStatChip,
   });
 
   final bool isCancelIconExist;
   final String name;
   final String addr;
   final int stat;
-  final double lat;
-  final double lng;
-  final NaverMapController nMapController;
-  final BoxController boxController;
-  final EvCharger charger;
+  final VoidCallback onTap;
+  final bool isStatChip;
 
   @override
   State<ListtileChargerinfoWidget> createState() => _ListtileChargerinfoWidgetState();
 }
 
-// Future<void> moveCameraPosition(double lat, double lng, BuildContext context, NaverMapController controller) async {
-//   final cameraUpdate = NCameraUpdate.withParams(
-//     target: NLatLng(lat, lng), // 새 위치
-//     bearing: 0, // 북쪽 방향 고정 (선택)
-//   );
-//   if (controller != null) {
-//     // await controller.moveCamera(CameraUpdate.scrollTo(LatLng(lat, lng)));
-//     // await controller.latLngToScreenLocation(NLatLng(lat, lng));
-//     // await controller.updateCamera(cameraUpdate);
-//     controller.updateCamera(cameraUpdate);
-//
-//     // Navigator.pop(context);
-//   }
-// }
-
 class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
-  static MapCameraController cameraController = MapCameraController();
-
   @override
   Widget build(BuildContext context) {
     //검색창 및 슬라이딩 박스에 있는 listtile 하나
     return GestureDetector(
-      onTap: () async {
-        widget.boxController.closeBox();
-        cameraController.moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
-        // moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
+      onTap: widget.onTap,
 
-        final statIds = await FavoriteService.getFavoriteStatIds('test_user');
-        final isFavorite = statIds.contains(widget.charger.statId);
+      // onTap: () async {
+      //   widget.boxController.closeBox();
+      //   cameraController.moveCameraPosition(widget.lat, widget.lng, widget.nMapController);
+      //   // moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
+      //
+      //   final statIds = await FavoriteService.getFavoriteStatIds('test_user');
+      //   final isFavorite = statIds.contains(widget.charger.statId);
+      //
+      //   showModalBottomSheet(
+      //     context: context,
+      //     builder: (_) => ChargerDetailCard(
+      //       charger: widget.charger,
+      //       isFavorite: isFavorite,
+      //     ),
+      //   );
+      // },
 
-        showModalBottomSheet(
-          context: context,
-          builder: (_) => ChargerDetailCard(
-            charger: widget.charger,
-            isFavorite: isFavorite,
-          ),
-        );
-      },
       child: Padding(
         padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
-        child: Container(
+        child: SizedBox(
           width: MediaQuery.of(context).size.width,
-          height: 60,
+          height: MediaQuery.of(context).size.height * 0.08,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -91,24 +71,26 @@ class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(widget.name, style: TextStyle(fontWeight: FontWeight.w700)),
-                      SizedBox(width: 20),
+                      // SizedBox(width: 10),
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.5,
-                        child: Text(widget.addr, style: TextStyle(fontSize: 13, overflow: TextOverflow.fade)),
+                        child: Text(widget.addr, style: TextStyle(fontSize: 13, overflow: TextOverflow.ellipsis)),
                       ),
                     ],
                   ),
                 ],
               ),
-              Chip(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30), // 더 크게 할수록 더 둥글어짐
-                ),
-                visualDensity: VisualDensity.compact,
-                labelPadding: EdgeInsets.all(2.0),
-                label: Text(_convertStatusText(widget.stat), style: TextStyle(color: Colors.white, fontSize: 10)),
-                backgroundColor: _convertStatusColor(widget.stat),
-              ),
+              widget.isStatChip
+                  ? Chip(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30), // 더 크게 할수록 더 둥글어짐
+                      ),
+                      visualDensity: VisualDensity.compact,
+                      labelPadding: EdgeInsets.all(2.0),
+                      label: Text(_convertStatusText(widget.stat), style: TextStyle(color: Colors.white, fontSize: 10)),
+                      backgroundColor: _convertStatusColor(widget.stat),
+                    )
+                  : SizedBox.shrink(),
               widget.isCancelIconExist ? IconButton(onPressed: () {}, icon: Icon(Icons.close)) : SizedBox.shrink(),
             ],
           ),

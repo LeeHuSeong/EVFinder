@@ -110,7 +110,6 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
 
                   // 즐겨찾기 아이콘
                   IconButton(
-
                     onPressed: toggleFavorite,
                     icon: Icon(
                       isFavorite ? Icons.star : Icons.star_border,

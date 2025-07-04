@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Controller/login_controller.dart';
 import 'signup_view.dart';
-import '../Service/LoginService.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -20,8 +19,30 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
-  void handleGoogleLogin() {
+  void handleGoogleLogin() async{
     _controller.signInWithGoogle(context);
+    setState(() {
+      isLoading = true;
+    });
+
+    await Future.delayed(const Duration(seconds: 1)); // React 스타일 대기
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  void handleLogin() async{
+    _controller.login(context);
+    setState(() {
+      isLoading = true;
+    });
+
+    await Future.delayed(const Duration(seconds: 1)); // React 스타일 대기
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   void handleSignup() {
@@ -113,9 +134,7 @@ class _LoginViewState extends State<LoginView> {
 
               // 로그인 버튼
               ElevatedButton(
-                onPressed: () {
-                  _controller.login(context);
-                },
+                onPressed: handleLogin,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF10B981), // emerald-500
                   minimumSize: const Size(double.infinity, 50),

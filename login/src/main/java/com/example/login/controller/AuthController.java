@@ -35,7 +35,6 @@ public class AuthController {
         if (email == null || email.isEmpty()) {
             return ResponseEntity.badRequest().body(new LoginResponse(false, "이메일을 입력해주세요."));
         }
-
         return ResponseEntity.ok(authService.sendPasswordResetEmail(email));
     }
 

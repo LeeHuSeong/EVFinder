@@ -22,6 +22,7 @@ class MarkerService {
   // }
 
   static MapCameraController cameraController = MapCameraController();
+  static Set<String> _addedMarkerIds = {}; // ID 추적용
 
   static List<NMarker> generateMarkers(List<EvCharger> chargers, BuildContext context, NaverMapController nMapController) {
     return chargers.map((charger) {
@@ -31,7 +32,7 @@ class MarkerService {
         caption: NOverlayCaption(text: charger.name),
       );
       marker.setOnTapListener((NMarker marker) {
-        cameraController.moveCameraPosition(charger.lat, charger.lng, context, nMapController);
+        cameraController.moveCameraPosition(charger.lat, charger.lng, nMapController);
         showModalBottomSheet(
           context: context,
           builder: (_) => ChargerDetailCard(charger: charger),
@@ -41,9 +42,47 @@ class MarkerService {
     }).toList();
   }
 
-  static void addMarkersToMap(NaverMapController controller, List<NMarker> markers) {
+  static Future<void> addMarkersToMap(NaverMapController controller, List<NMarker> markers) async {
     for (var marker in markers) {
-      controller.addOverlay(marker);
+      try {
+        await controller.addOverlay(marker);
+        _addedMarkerIds.add(marker.info.id);
+      } catch (e) {
+        print("마커 추가 실패: ${marker.info.id}, 이유: $e");
+      }
     }
   }
+
+  static Future<void> removeMarkers(NaverMapController controller, List<NMarker> markers) async {
+    for (var marker in List.from(markers)) {
+      if (_addedMarkerIds.contains(marker.info.id)) {
+        try {
+          await controller.deleteOverlay(marker.info);
+          _addedMarkerIds.remove(marker.info.id); // 삭제된 것 제거
+        } catch (e) {
+          print("마커 삭제 실패: ${marker.info.id}, 이유: $e");
+        }
+      } else {
+        print("이미 삭제된 마커 또는 등록되지 않은 마커: ${marker.info.id}");
+      }
+    }
+    markers.clear();
+  }
+
+  // static void addMarkersToMap(NaverMapController controller, List<NMarker> markers) {
+  //   for (var marker in markers) {
+  //     controller.addOverlay(marker);
+  //   }
+  // }
+  //
+  // static Future<void> removeMarkers(NaverMapController controller, List<NMarker> markers) async {
+  //   for (var marker in List.from(markers)) {
+  //     try {
+  //       await controller.deleteOverlay(marker.info);
+  //     } catch (e) {
+  //       print("마커 삭제 실패: ${marker.info.id}, 이유: $e");
+  //     }
+  //   }
+  //   markers.clear(); // 리스트 수정은 반복 이후에!
+  // }
 }

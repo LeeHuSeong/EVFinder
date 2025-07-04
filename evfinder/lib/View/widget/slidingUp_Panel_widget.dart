@@ -5,6 +5,7 @@ import 'package:flutter_sliding_box/flutter_sliding_box.dart';
 
 import '../../Controller/map_camera_controller.dart';
 import '../../Model/ev_charger_model.dart';
+import '../../Service/favorite_service.dart';
 import 'charger_detail_card.dart';
 
 class SlidingupPanelWidget extends StatefulWidget {
@@ -41,12 +42,14 @@ class _SlidingupPanelWidgetState extends State<SlidingupPanelWidget> {
               onTap: () async {
                 widget.boxController.closeBox();
                 cameraController.moveCameraPosition(widget.chargers[index].lat, widget.chargers[index].lng, widget.nMapController);
-                // moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
+                final statIds = await FavoriteService.getFavoriteStatIds('test_user');
+                final isFavorite = statIds.contains(widget.chargers[index].statId);
                 showModalBottomSheet(
                   context: context,
-                  builder: (_) => ChargerDetailCard(charger: widget.chargers[index]),
+                  builder: (_) => ChargerDetailCard(charger: widget.chargers[index], isFavorite: isFavorite),
                 );
-              }, isStatChip: true,
+              },
+              isStatChip: true,
             );
           },
           separatorBuilder: (BuildContext context, int index) => Divider(),

@@ -55,6 +55,21 @@ public class FavoriteController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/list")
+    public Map<String, Object> getFavorites(@RequestParam String userId) {
+        List<Map<String, Object>> favorites = favoriteService.getFavorites(userId);
+
+        // statId가 누락되었을 가능성 대비 → 문서 ID를 statId로 추가
+        for (Map<String, Object> fav : favorites) {
+            if (!fav.containsKey("statId") && fav.containsKey("id")) {
+                fav.put("statId", fav.get("id"));
+            }
+        }
+
+        return Map.of("favorites", favorites);
+    }
+
+
     @GetMapping("/test")
     public ResponseEntity<?> testFavorites(@RequestParam String userId) {
         try {

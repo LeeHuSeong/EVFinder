@@ -3,8 +3,8 @@ package com.example.login.dto;
 public class SignupRequest {
     private String email;
     private String password;
-    public SignupRequest() {
-    }
+
+    public SignupRequest() {}
 
     public SignupRequest(String email, String password) {
         this.email = email;
@@ -26,5 +26,4 @@ public class SignupRequest {
     public void setPassword(String password) {
         this.password = password;
     }
-
 }

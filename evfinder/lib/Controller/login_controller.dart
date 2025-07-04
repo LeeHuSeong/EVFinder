@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:evfinder/constants/api_constants.dart';
 import 'package:evfinder/View/main_view.dart';
 import 'package:flutter/material.dart';
 import '../Model/user_model.dart';
@@ -61,7 +61,7 @@ class LoginController {
       }
 
       final response = await http.post(
-        Uri.parse('http://100.100.100.63:8081/auth/login'),
+        Uri.parse('${ApiConstants.authApiBaseUrl}/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'idToken': idToken}),
       );
@@ -120,7 +120,7 @@ class LoginController {
       }
 
       final response = await http.post(
-        Uri.parse('http://100.100.100.63:8081/auth/login'), // 에뮬레이터용 주소
+        Uri.parse('${ApiConstants.authApiBaseUrl}/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'idToken': idToken}),
       );

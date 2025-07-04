@@ -60,7 +60,15 @@ class FavoriteService {
   static Future<List<Map<String, dynamic>>> fetchFavoritesWithStat({
     required String userId,
   }) async {
-    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/global/listWithStat?userId=$userId');
+
+    // 임시값 (서울)
+    final double userLat = 37.5665;
+    final double userLng = 126.9780;
+
+    final url = Uri.parse(
+      '${ApiConstants.favoriteApiBaseUrl}/global/listWithStat'
+          '?userId=$userId&lat=$userLat&lng=$userLng',
+    );
 
     final response = await http.get(url);
     print('[DEBUG] 응답: ${response.body}');
@@ -97,7 +105,7 @@ class FavoriteService {
   }
 
 
-  //없애도 될 것 같기도.
+
   static Future<int> fetchStat(String statId) async {
     final url = Uri.parse('${ApiConstants.evApiBaseUrl}/stat?statId=$statId');
     final response = await http.get(url);
@@ -134,7 +142,7 @@ class FavoriteService {
     }
   }
 
-  // 없애도 될 것 같기도 2
+
   static Future<bool> updateStat(String userId, String statId, int stat) async {
     final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/updateStat');
 

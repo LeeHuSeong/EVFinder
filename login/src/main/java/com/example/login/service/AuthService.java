@@ -8,6 +8,7 @@ import com.example.login.util.JwtUtil;
 import com.google.firebase.auth.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.google.firebase.auth.UserRecord.UpdateRequest;
 
 @Service
 public class AuthService {
@@ -56,12 +57,19 @@ public class AuthService {
     }
 
     // 비밀번호 재설정 이메일 전송
-    public LoginResponse sendPasswordResetEmail(String email) {
+    public LoginResponse resetPw(String idToken, String newPassword) {
         try {
-            FirebaseAuth.getInstance().generatePasswordResetLink(email);
-            return new LoginResponse(true, "비밀번호 재설정 이메일 전송됨");
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            String uid = decodedToken.getUid();
+
+            UpdateRequest updateRequest = new UpdateRequest(uid)
+                    .setPassword(newPassword);
+
+            FirebaseAuth.getInstance().updateUser(updateRequest);
+
+            return new LoginResponse(true, "비밀번호가 성공적으로 변경되었습니다.");
         } catch (FirebaseAuthException e) {
-            return new LoginResponse(false, "비밀번호 재설정 실패: " + e.getMessage());
+            return new LoginResponse(false, "비밀번호 변경 실패: " + e.getMessage());
         }
     }
 

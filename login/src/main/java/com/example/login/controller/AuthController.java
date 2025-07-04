@@ -1,5 +1,6 @@
 package com.example.login.controller;
 
+import com.example.login.dto.ChangePasswordRequest;
 import com.example.login.dto.LoginRequest;
 import com.example.login.dto.LoginResponse;
 import com.example.login.dto.SignupRequest;
@@ -29,14 +30,17 @@ public class AuthController {
 
     // 비밀번호 재설정 이메일 전송
     @PostMapping("/changepw")
-    public ResponseEntity<LoginResponse> changepw(@RequestBody LoginRequest request) {
-        String email = request.getEmail();
+    public ResponseEntity<LoginResponse> changepw(@RequestBody ChangePasswordRequest request) {
+        String idToken = request.getIdToken();
+        String newPassword = request.getNewPassword();
 
-        if (email == null || email.isEmpty()) {
-            return ResponseEntity.badRequest().body(new LoginResponse(false, "이메일을 입력해주세요."));
+        if (idToken == null || newPassword == null || newPassword.isEmpty()) {
+            return ResponseEntity.badRequest().body(new LoginResponse(false, "토큰과 새 비밀번호를 입력해주세요."));
         }
-        return ResponseEntity.ok(authService.sendPasswordResetEmail(email));
+
+        return ResponseEntity.ok(authService.resetPw(idToken, newPassword));
     }
+
 
     // 회원 탈퇴
     @DeleteMapping("/delete")

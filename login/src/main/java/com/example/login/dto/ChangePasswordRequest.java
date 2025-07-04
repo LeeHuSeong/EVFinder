@@ -1,19 +1,21 @@
 package com.example.login.dto;
 
 public class ChangePasswordRequest {
-    private String email;
+    private String idToken;
+    private String newPassword;
 
-    public ChangePasswordRequest() {}
-
-    public ChangePasswordRequest(String email) {
-        this.email = email;
+    public String getIdToken() {
+        return idToken;
     }
 
-    public String getEmail() {
-        return email;
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public String getNewPassword() {
+        return newPassword;
+    }
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 }

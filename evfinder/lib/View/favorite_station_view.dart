@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:evfinder/Service/favorite_service.dart';
-import 'package:evfinder/Service/ev_charger_service.dart';
 import 'package:evfinder/View/widget/listtitle_Chargestar_widget.dart';
 
 class FavoriteStationView extends StatefulWidget {
@@ -13,7 +12,7 @@ class FavoriteStationView extends StatefulWidget {
 class _FavoriteStationViewState extends State<FavoriteStationView> {
   List<Map<String, dynamic>> favoriteStations = [];
   bool isLoading = true;
-  final String userId = 'test_user'; // 나중에 SharedPreferences로 대체
+  final String userId = 'test_user'; // TODO: SharedPreferences로 대체 예정
 
   @override
   void initState() {
@@ -25,55 +24,33 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
     setState(() => isLoading = true);
 
     try {
-      const double lat = 37.5665;
-      const double lng = 126.9780;
+      // 1. 서버에서 즐겨찾기 목록 + 최신 stat + 거리정보 포함해서 가져오기
+      final rawFavorites = await FavoriteService.fetchFavoritesWithStat(userId: userId);
 
-      // 1. DB에서 즐겨찾기 목록 가져오기
-      final rawFavorites = await FavoriteService.fetchFavoritesWithStat(
-        userId: userId,
-        lat: lat,
-        lng: lng,
-      );
-
-      // 2. stat 갱신 및 정규화 (2, 3만 이용 가능으로 처리)
-      final updatedFavorites = await Future.wait(rawFavorites.map((e) async {
-        try {
-          final stat = await FavoriteService.fetchStat(e['statId']);
-          e['stat'] = (stat == 2 || stat == 3) ? 1 : 0; // ✅ 1: 가능, 0: 불가
-        } catch (_) {
-          e['stat'] = 0;
-        }
-        return e;
-      }));
-
-      // 3. 화면에 표시할 데이터로 변환
+      // 2. 바로 UI에 사용할 수 있도록 매핑
       setState(() {
-        print("🎯 즐겨찾기 개수: ${rawFavorites.length}");
-        favoriteStations = updatedFavorites.map((e) {
+        favoriteStations = rawFavorites.map((e) {
           return {
-            "name": e['name'],
-            "addr": e['addr'],
-            "useTime": e['useTime'],
-            "stat": e['stat'], // 이미 1 또는 0으로 정규화됨
+            "name": e['name']?.toString() ?? '알 수 없음',
+            "addr": e['addr']?.toString() ?? '주소 없음',
+            "useTime": e['useTime']?.toString() ?? '',
+            "stat": e['stat'] ?? 0,
             "statId": e['statId'],
-            "distance": '${e['distance']}km',
+            "distance": e['distance']?.toString() ?? '',
             "isFavorite": true,
           };
         }).toList();
         isLoading = false;
       });
     } catch (e) {
-      print("❌ 즐겨찾기 목록 불러오기 실패: $e");
+      print("즐겨찾기 목록 불러오기 실패: $e");
       setState(() => isLoading = false);
     }
   }
 
-
-
   Future<void> toggleFavorite(int index) async {
     final statId = favoriteStations[index]['statId'];
 
-    // 즐겨찾기 해제 요청
     final success = await FavoriteService.removeFavorite(userId, statId);
     if (success) {
       setState(() {
@@ -93,9 +70,7 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('즐겨찾기 충전소'),
-      ),
+      appBar: AppBar(title: Text('즐겨찾기 충전소')),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -124,6 +99,15 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
             ],
           ),
         ),
+      ),
+
+      //Refresh버튼
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await loadFavoriteStations();
+        },
+        child: Icon(Icons.refresh),
+        backgroundColor: Color(0xFF10B981),
       ),
     );
   }

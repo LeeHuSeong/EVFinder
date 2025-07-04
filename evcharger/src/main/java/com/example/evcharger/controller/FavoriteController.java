@@ -1,6 +1,5 @@
 package com.example.evcharger.controller;
 
-import com.example.evcharger.service.FavoriteStatusService;
 import com.google.cloud.firestore.Firestore;
 
 import java.util.ArrayList;
@@ -16,6 +15,10 @@ import com.example.evcharger.model.ApiResponse;
 import java.util.Map;
 import com.example.evcharger.model.ApiResponse;
 
+//로그
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 @RequestMapping("/api/favorite")
 public class FavoriteController {
@@ -24,11 +27,9 @@ public class FavoriteController {
     private FavoriteService favoriteService;
 
     @Autowired
-    private FavoriteStatusService favoriteStatusService;
-
-    //테스트를 위한 추가
-    @Autowired
     private Firestore firestore;
+
+    private static final Logger log = LoggerFactory.getLogger(FavoriteController.class);
 
     @PostMapping("/add")
     public ApiResponse addFavorite(@RequestBody Map<String, Object> request) {
@@ -37,15 +38,38 @@ public class FavoriteController {
         return favoriteService.addFavorite(userId, station);
     }
 
-    @GetMapping("/listWithStat")
-    public List<Map<String, Object>> getFavoritesWithUpdatedStat(
-            @RequestParam String userId,
-            @RequestParam double lat,
-            @RequestParam double lng) {
-        return favoriteStatusService.getFavoritesWithUpdatedStat(userId, lat, lng);
+    @PostMapping("/updateStat")
+    public ApiResponse updateStat(@RequestBody Map<String, Object> request) {
+        String userId = (String) request.get("userId");
+        String statId = (String) request.get("statId");
+        int stat = (int) request.get("stat");
+        return favoriteService.updateStat(userId, statId, stat);
     }
 
-    //테스트를 위함
+    @DeleteMapping("/remove")
+    public ResponseEntity<ApiResponse> removeFavorite(
+            @RequestParam String userId,
+            @RequestParam String statId) {
+        log.info("DELETE 요청 수신 - userId: {}, statId: {}", userId, statId);
+        ApiResponse result = favoriteService.removeFavorite(userId, statId);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/list")
+    public Map<String, Object> getFavorites(@RequestParam String userId) {
+        List<Map<String, Object>> favorites = favoriteService.getFavorites(userId);
+
+        // statId가 누락되었을 가능성 대비 → 문서 ID를 statId로 추가
+        for (Map<String, Object> fav : favorites) {
+            if (!fav.containsKey("statId") && fav.containsKey("id")) {
+                fav.put("statId", fav.get("id"));
+            }
+        }
+
+        return Map.of("favorites", favorites);
+    }
+
+
     @GetMapping("/test")
     public ResponseEntity<?> testFavorites(@RequestParam String userId) {
         try {

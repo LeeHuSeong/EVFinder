@@ -1,4 +1,6 @@
+import 'package:evfinder/Controller/map_camera_controller.dart';
 import 'package:evfinder/View/widget/slidingUp_Panel_widget.dart';
+import 'package:evfinder/Service/favorite_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_sliding_box/flutter_sliding_box.dart';
@@ -34,33 +36,42 @@ class ListtileChargerinfoWidget extends StatefulWidget {
   State<ListtileChargerinfoWidget> createState() => _ListtileChargerinfoWidgetState();
 }
 
-Future<void> moveCameraPosition(double lat, double lng, BuildContext context, NaverMapController controller) async {
-  final cameraUpdate = NCameraUpdate.withParams(
-    target: NLatLng(lat, lng), // 새 위치
-    bearing: 0, // 북쪽 방향 고정 (선택)
-  );
-  if (controller != null) {
-    // await controller.moveCamera(CameraUpdate.scrollTo(LatLng(lat, lng)));
-    // await controller.latLngToScreenLocation(NLatLng(lat, lng));
-    // await controller.updateCamera(cameraUpdate);
-    controller.updateCamera(cameraUpdate);
-
-    // Navigator.pop(context);
-  }
-}
+// Future<void> moveCameraPosition(double lat, double lng, BuildContext context, NaverMapController controller) async {
+//   final cameraUpdate = NCameraUpdate.withParams(
+//     target: NLatLng(lat, lng), // 새 위치
+//     bearing: 0, // 북쪽 방향 고정 (선택)
+//   );
+//   if (controller != null) {
+//     // await controller.moveCamera(CameraUpdate.scrollTo(LatLng(lat, lng)));
+//     // await controller.latLngToScreenLocation(NLatLng(lat, lng));
+//     // await controller.updateCamera(cameraUpdate);
+//     controller.updateCamera(cameraUpdate);
+//
+//     // Navigator.pop(context);
+//   }
+// }
 
 class _ListtileChargerinfoWidgetState extends State<ListtileChargerinfoWidget> {
+  static MapCameraController cameraController = MapCameraController();
+
   @override
   Widget build(BuildContext context) {
     //검색창 및 슬라이딩 박스에 있는 listtile 하나
     return GestureDetector(
       onTap: () async {
         widget.boxController.closeBox();
-        // controller.moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
-        moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
+        cameraController.moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
+        // moveCameraPosition(widget.lat, widget.lng, context, widget.nMapController);
+
+        final statIds = await FavoriteService.getFavoriteStatIds('test_user');
+        final isFavorite = statIds.contains(widget.charger.statId);
+
         showModalBottomSheet(
           context: context,
-          builder: (_) => ChargerDetailCard(charger: widget.charger),
+          builder: (_) => ChargerDetailCard(
+            charger: widget.charger,
+            isFavorite: isFavorite,
+          ),
         );
       },
       child: Padding(

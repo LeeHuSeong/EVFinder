@@ -2,6 +2,7 @@ import 'package:evfinder/Controller/map_camera_controller.dart';
 import 'package:evfinder/View/widget/charger_detail_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:evfinder/Service/favorite_service.dart';
 import '../../Model/ev_charger_model.dart'; // 또는 상대경로 맞게 수정
 
 class MarkerService {
@@ -30,13 +31,46 @@ class MarkerService {
         position: NLatLng(charger.lat, charger.lng),
         caption: NOverlayCaption(text: charger.name),
       );
-      marker.setOnTapListener((NMarker marker) {
+
+      marker.setOnTapListener((NMarker marker) async {
         cameraController.moveCameraPosition(charger.lat, charger.lng, context, nMapController);
+
+        final statIds = await FavoriteService.getFavoriteStatIds('test_user');
+
+        //디버깅용
+        print("📌 charger.statId = ${charger.statId} (${charger.statId.runtimeType})");
+        print("📋 Favorite statIds = $statIds");
+
+        final isFavorite = statIds.contains(charger.statId.toString());
+
         showModalBottomSheet(
           context: context,
-          builder: (_) => ChargerDetailCard(charger: charger),
+          isScrollControlled: true,
+          builder: (context) {
+            return StatefulBuilder(
+              builder: (context, setModalState) {
+                bool _isFavorite = isFavorite;
+
+                return ChargerDetailCard(
+                  charger: charger,
+                  isFavorite: _isFavorite,
+                  onFavoriteToggle: () async {
+                    if (_isFavorite) {
+                      await FavoriteService.removeFavorite("test_user", charger.statId);
+                    } else {
+                      await FavoriteService.addFavorite("test_user", charger);
+                    }
+                    setModalState(() {
+                      _isFavorite = !_isFavorite;
+                    });
+                  },
+                );
+              },
+            );
+          },
         );
       });
+
       return marker;
     }).toList();
   }

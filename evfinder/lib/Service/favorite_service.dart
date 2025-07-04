@@ -116,14 +116,21 @@ class FavoriteService {
 
   static Future<List<String>> getFavoriteStatIds(String userId) async {
     final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/list?userId=$userId');
-    final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> json = jsonDecode(response.body);
-      final List<dynamic> favorites = json['favorites'];
-      return favorites.map((e) => e['statId'] as String).toList();
-    } else {
-      throw Exception('Failed to fetch favorite statIds');
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> json = jsonDecode(response.body);
+        final List<dynamic> favorites = json['favorites'];
+        return favorites.map((e) => e['statId'].toString()).toList();
+      } else {
+        print("서버 응답 에러: ${response.statusCode}");
+        return []; // 실패 시에도 빈 리스트 반환
+      }
+    } catch (e) {
+      print("statId 받아오기 실패: $e");
+      return []; // 네트워크 오류 등 실패 시도 처리
     }
   }
 

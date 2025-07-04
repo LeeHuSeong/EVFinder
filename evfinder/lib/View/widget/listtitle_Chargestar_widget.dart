@@ -31,13 +31,18 @@ class _ListtileChargestarWidgetState extends State<ListtileChargestarWidget>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
+  late bool isFavorite; // 내부 상태로 관리
+
   @override
   void initState() {
     super.initState();
+    isFavorite = widget.isFavorite; // 초기 상태 설정
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
+
     _scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 1.2,
@@ -57,7 +62,12 @@ class _ListtileChargestarWidgetState extends State<ListtileChargestarWidget>
     _animationController.forward().then((_) {
       _animationController.reverse();
     });
-    widget.onFavoriteToggle?.call();
+
+    setState(() {
+      isFavorite = !isFavorite; // 내부 상태 토글
+    });
+
+    widget.onFavoriteToggle?.call(); // 콜백 호출
   }
 
   @override
@@ -118,7 +128,6 @@ class _ListtileChargestarWidgetState extends State<ListtileChargestarWidget>
                             ),
                           ),
                           const SizedBox(width: 8),
-                          // 상태 배지 (getStatusLabel & getStatusColor 기반)
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
@@ -207,14 +216,14 @@ class _ListtileChargestarWidgetState extends State<ListtileChargestarWidget>
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: widget.isFavorite
+                            color: isFavorite
                                 ? const Color(0xFFFEF3C7)
                                 : const Color(0xFFF3F4F6),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            widget.isFavorite ? Icons.star : Icons.star_border,
-                            color: widget.isFavorite
+                            isFavorite ? Icons.star : Icons.star_border,
+                            color: isFavorite
                                 ? const Color(0xFFF59E0B)
                                 : const Color(0xFF9CA3AF),
                             size: 20,
@@ -233,6 +242,7 @@ class _ListtileChargestarWidgetState extends State<ListtileChargestarWidget>
   }
 }
 
+
 String getStatusLabel(int stat) {
   switch (stat) {
     case 0: return '알수없음';
@@ -248,12 +258,15 @@ String getStatusLabel(int stat) {
 Color getStatusColor(int stat) {
   switch (stat) {
     case 2:
-      return const Color(0xFF059669); // 초록
+      return const Color(0xFF059669); // 초록 (사용 가능)
     case 3:
-      return const Color(0xFF2563EB); // 파랑 (충전중)
+      return const Color(0xFF2563EB); // 파랑 (충전 중)
+    case 4:
     case 5:
-      return const Color(0xFFDC2626); // 빨강 (점검)
+      return const Color(0xFFDC2626); // 빨강 (중지, 점검)
+    case 1:
+      return const Color(0xFFF97316); // 주황 (통신이상)
     default:
-      return const Color(0xFF9CA3AF); // 회색
+      return const Color(0xFF9CA3AF); // 회색 (기타)
   }
 }

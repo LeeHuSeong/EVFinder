@@ -36,7 +36,9 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
             "useTime": e['useTime']?.toString() ?? '',
             "stat": e['stat'] ?? 0,
             "statId": e['statId'],
-            "distance": e['distance']?.toString() ?? '',
+            'distance': e['distance'] != null
+                ? "${double.parse(e['distance'].toString()).toStringAsFixed(1)} km"
+                : '',
             "isFavorite": true,
           };
         }).toList();

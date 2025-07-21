@@ -1,15 +1,22 @@
 package com.example.login.dto;
 
 public class LoginRequest {
-    private String email;
-    private String password;
+    private String idToken; // 구글 로그인, Firebase 로그인용
+    private String email;   // 비밀번호 변경용
 
-    public LoginRequest() {
+    public LoginRequest() {}
+
+    public LoginRequest(String idToken, String email) {
+        this.idToken = idToken;
+        this.email = email;
     }
 
-    public LoginRequest(String email, String password) {
-        this.email = email;
-        this.password = password;
+    public String getIdToken() {
+        return idToken;
+    }
+
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
     }
 
     public String getEmail() {
@@ -18,13 +25,5 @@ public class LoginRequest {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

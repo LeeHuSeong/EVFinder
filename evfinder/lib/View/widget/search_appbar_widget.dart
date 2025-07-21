@@ -2,7 +2,9 @@ import 'package:evfinder/View/search_charger_view.dart';
 import 'package:flutter/material.dart';
 
 class SearchAppbarWidget extends StatelessWidget {
-  const SearchAppbarWidget({super.key});
+  const SearchAppbarWidget({super.key, required this.onTap});
+
+  final VoidCallback onTap;
 
   @override
   @override
@@ -10,9 +12,7 @@ class SearchAppbarWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 60, 16, 16),
       child: GestureDetector(
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => SearchChargerView()));
-        },
+        onTap: onTap,
         child: Container(
           width: MediaQuery.of(context).size.width * 0.9,
           height: MediaQuery.of(context).size.height * 0.06,

@@ -70,7 +70,6 @@ public class FindEvChargerService {
                 .toList();
 
 }
-
  
     public int getStatByStatId(String statId) {
     try {
@@ -98,9 +97,6 @@ public class FindEvChargerService {
         throw new RuntimeException("충전소 상태 조회 실패", e);
     }
 }
-
-
-
 
     private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
         final int R = 6371;

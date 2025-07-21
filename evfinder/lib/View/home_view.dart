@@ -1,3 +1,4 @@
+import 'package:evfinder/Controller/location_permission_controller.dart';
 import 'package:evfinder/Controller/map_camera_controller.dart';
 import 'package:evfinder/View/search_charger_view.dart';
 import 'package:evfinder/View/widget/search_appbar_widget.dart';
@@ -5,12 +6,11 @@ import 'package:evfinder/View/widget/slidingUp_Panel_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_sliding_box/flutter_sliding_box.dart';
+import 'package:geolocator/geolocator.dart';
 import '../Model/search_charger_model.dart';
 import '../Service/marker_service.dart';
 import '../Service/ev_charger_service.dart'; // ✅ 서버 호출용
 import '../../Model/ev_charger_model.dart'; // ✅ 모델
-import '../Service/ev_charger_service.dart';
-import '../../Model/ev_charger_model.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -26,11 +26,26 @@ class _HomeViewState extends State<HomeView> {
   List<NMarker> _markers = [];
   List<EvCharger> _chargers = [];
   bool _isMapReady = false;
+  final LocationPermissionController locationController = LocationPermissionController();
+  bool isLocationLoaded = false;
 
   @override
   void initState() {
     super.initState();
+    _initializeLocation();
     // 마커는 지도 준비 후 표시됨
+  }
+
+  Future<void> _initializeLocation() async {
+    await locationController.getCurrentLocation();
+
+    setState(() {
+      isLocationLoaded = true;
+      if (isLocationLoaded && locationController.position != null) {
+        //권한이 있으면 실행, 위도 경도로 도로명 주소 받아 와서 fetchChargers() 실행 해야함
+        cameraController.moveCameraPosition(locationController.position!.latitude, locationController.position!.longitude, _nMapController);
+      }
+    });
   }
 
   Future<void> fetchSearchResult(BuildContext context, MapCameraController ncController, dynamic result) async {
@@ -41,14 +56,14 @@ class _HomeViewState extends State<HomeView> {
       }
 
       await fetchChargers(result.addressName);
-      cameraController.moveCameraPosition(double.parse(result.y), double.parse(result.x), _nMapController);
 
       // 마커 새로 로딩
       _loadMarkers(_chargers); // 이 부분 꼭 필요!
 
       setState(() {}); // UI 갱신을 위해 필요할 수도 있음
+    } else {
+      await fetchChargers("서울특별시 중구 세종대로 110");
     }
-    await fetchChargers("서울특별시 중구 세종대로 110");
   }
 
   Future<void> fetchChargers(String addressName) async {
@@ -78,7 +93,9 @@ class _HomeViewState extends State<HomeView> {
             onMapReady: (controller) async {
               await fetchSearchResult(context, cameraController, null);
               _nMapController = controller;
-              _isMapReady = true;
+              setState(() {
+                _isMapReady = true;
+              });
               _loadMarkers(_chargers); // 서버에서 충전소 받아와서 마커 표시
             },
           ),

@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'package:evfinder/constants/api_constants.dart';
 import 'package:evfinder/View/main_view.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:evfinder/View/home_view.dart';
 import 'package:http/http.dart' as http;
+
 
 
 class LoginController {
@@ -51,6 +53,10 @@ class LoginController {
         password: password,
       );
 
+      final uid = userCredential.user?.uid;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('uid', uid!); //uid 저장
+
       final String? idToken = await userCredential.user?.getIdToken();
 
       if (idToken == null) {
@@ -71,6 +77,9 @@ class LoginController {
 
         if (decoded['success'] == true) {
           final String jwt = decoded['jwt'];
+          
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('jwt', jwt);
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('로그인 성공')),
@@ -111,6 +120,9 @@ class LoginController {
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
 
       final String? idToken = await userCredential.user?.getIdToken();
+      final uid = userCredential.user?.uid;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('uid', uid!);
 
       if (idToken == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -130,6 +142,9 @@ class LoginController {
 
         if (decoded['success'] == true) {
           final String jwt = decoded['jwt'];
+
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('jwt', jwt);
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Google 로그인 성공')),

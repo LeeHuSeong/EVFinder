@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:evfinder/constants/api_constants.dart';
 import 'package:evfinder/View/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -73,7 +73,7 @@ class SignupController {
 
   try {
     final response = await http.post(
-      Uri.parse('http://100.100.100.63:8081/auth/signup'),
+      Uri.parse('${ApiConstants.authApiBaseUrl}/signup'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email, 'password': password}),
     );

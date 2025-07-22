@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  evcharger:
+    build:
+      context: ./evcharger
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
+  login:
+    build:
+      context: ./login
+    ports:
+      - "8081:8081"
+    networks:
+      - backend
+
+networks:
+  backend:

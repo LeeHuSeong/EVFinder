@@ -89,7 +89,6 @@ public class FavoriteService {
         }
     }
 
-    
     //stat업데이트 해주기.
     public ApiResponse updateStat(String userId, String statId, int stat) {
     try {

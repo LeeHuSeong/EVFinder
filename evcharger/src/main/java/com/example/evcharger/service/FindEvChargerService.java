@@ -34,8 +34,8 @@ public class FindEvChargerService {
         br.close();
 
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> jsonMap = mapper.readValue(sb.toString(), Map.class);
-        Map<String, Object> response = (Map<String, Object>) jsonMap.get("items");
+        Map<String, Object> fullJson = mapper.readValue(sb.toString(), Map.class);
+        Map<String, Object> response = (Map<String, Object>) fullJson.get("items");
 
         List<Map<String, Object>> items = (List<Map<String, Object>>) response.get("item");
         List<Map<String, Object>> filtered = new ArrayList<>();
@@ -70,7 +70,6 @@ public class FindEvChargerService {
                 .toList();
 
 }
-
  
     public int getStatByStatId(String statId) {
     try {
@@ -98,9 +97,6 @@ public class FindEvChargerService {
         throw new RuntimeException("충전소 상태 조회 실패", e);
     }
 }
-
-
-
 
     private double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
         final int R = 6371;

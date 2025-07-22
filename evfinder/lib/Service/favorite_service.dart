@@ -5,11 +5,11 @@ import '../constants/api_constants.dart';
 
 class FavoriteService {
   /// 즐겨찾기 추가
-  static Future<bool> addFavorite(String userId, EvCharger charger) async {
+  static Future<bool> addFavorite(String uid, EvCharger charger) async {
     final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/add');
 
     final body = {
-      "userId": userId,
+      "uid": uid,
       "station": {
         "statId": charger.statId,
         "name": charger.name,
@@ -26,19 +26,21 @@ class FavoriteService {
         "timestamp": DateTime.now().toIso8601String(),
       }
     };
+    print('[DEBUG] 즐겨찾기 추가 요청: $body');
 
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(body),
     );
-
+    print('[DEBUG] 응답 코드: ${response.statusCode}');
+    print('[DEBUG] 응답 내용: ${response.body}');
     return response.statusCode == 200;
   }
 
   /// 즐겨찾기 목록 조회
-  static Future<List<Map<String, dynamic>>> fetchFavorites(String userId) async {
-    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/list?userId=$userId');
+  static Future<List<Map<String, dynamic>>> fetchFavorites(String uid) async {
+    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/list?uid=$uid');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -50,15 +52,15 @@ class FavoriteService {
   }
 
 
-  static Future<bool> removeFavorite(String userId, String statId) async {
-    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/remove?userId=$userId&statId=$statId');
+  static Future<bool> removeFavorite(String uid, String statId) async {
+    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/remove?uid=$uid&statId=$statId');
     final response = await http.delete(url);
     return response.statusCode == 200;
   }
 
 
   static Future<List<Map<String, dynamic>>> fetchFavoritesWithStat({
-    required String userId,
+    required String uid,
   }) async {
 
     // 임시값 (서울)
@@ -67,7 +69,7 @@ class FavoriteService {
 
     final url = Uri.parse(
       '${ApiConstants.favoriteApiBaseUrl}/global/listWithStat'
-          '?userId=$userId&lat=$userLat&lng=$userLng',
+          '?uid=$uid&lat=$userLat&lng=$userLng',
     );
 
     final response = await http.get(url);
@@ -122,8 +124,8 @@ class FavoriteService {
   }
 
 
-  static Future<List<String>> getFavoriteStatIds(String userId) async {
-    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/list?userId=$userId');
+  static Future<List<String>> getFavoriteStatIds(String uid) async {
+    final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/list?uid=$uid');
 
     try {
       final response = await http.get(url);
@@ -143,11 +145,11 @@ class FavoriteService {
   }
 
 
-  static Future<bool> updateStat(String userId, String statId, int stat) async {
+  static Future<bool> updateStat(String uid, String statId, int stat) async {
     final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/updateStat');
 
     final body = {
-      "userId": userId,
+      "uid": uid,
       "statId": statId,
       "stat": stat,
     };

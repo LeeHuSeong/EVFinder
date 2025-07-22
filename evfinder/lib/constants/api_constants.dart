@@ -5,4 +5,5 @@ class ApiConstants {
   static const String evApiBaseUrl = '$baseUrl/api/ev';
   static const String favoriteApiBaseUrl = '$baseUrl/api/favorite';
   static const String keywordForSearch = '$baseUrl/api/keyword';
+  static const String addressApiBaseUrl = '$baseUrl/api/ev/coord2addr?';
 }

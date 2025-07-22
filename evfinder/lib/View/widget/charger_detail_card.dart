@@ -2,24 +2,63 @@ import 'package:flutter/material.dart';
 import '../../Model/ev_charger_model.dart';
 import 'package:evfinder/Service/favorite_service.dart';
 
-class ChargerDetailCard extends StatelessWidget {
+class ChargerDetailCard extends StatefulWidget {
   final EvCharger charger;
   final bool isFavorite;
   final VoidCallback? onFavoriteToggle;
+
+  final String uid;
 
   const ChargerDetailCard({
     super.key,
     required this.charger,
     required this.isFavorite,
+    required this.uid,
     this.onFavoriteToggle,
   });
 
-  String _getAvailabilityText(int stat) {
-    return stat == 2 ? '1/1' : '0/1';
+  @override
+  State<ChargerDetailCard> createState() => _ChargerDetailCardState();
+}
+
+class _ChargerDetailCardState extends State<ChargerDetailCard> {
+  late bool _isFavorite;
+  bool _isProcessing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.isFavorite;
+  }
+
+  void _toggleFavorite() async {
+    if (_isProcessing) return;//중복 방지
+    _isProcessing = true;
+
+    try {
+      if (_isFavorite) {
+        await FavoriteService.removeFavorite(widget.uid, widget.charger.statId);
+      } else {
+        await FavoriteService.addFavorite(widget.uid, widget.charger);
+      }
+
+      setState(() {
+        _isFavorite = !_isFavorite;
+      });
+
+      if (widget.onFavoriteToggle != null) {
+        widget.onFavoriteToggle!();
+      }
+    } catch (e) {
+      print(" 즐겨찾기 처리 오류: $e");
+    } finally {
+      _isProcessing = false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final charger = widget.charger;
     final chargerTypeText = _convertChargerType(charger.chgerType);
     final chargerStateColor = _convertStatusColor(charger.stat);
 
@@ -54,9 +93,9 @@ class ChargerDetailCard extends StatelessWidget {
                     ],
                   ),
                   IconButton(
-                    onPressed: onFavoriteToggle,
+                    onPressed: _isProcessing ? null : _toggleFavorite, // 처리 중이면 비활성화
                     icon: Icon(
-                      isFavorite ? Icons.star : Icons.star_border,
+                      _isFavorite ? Icons.star : Icons.star_border,
                       color: Colors.yellow,
                     ),
                   ),
@@ -106,6 +145,10 @@ class ChargerDetailCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getAvailabilityText(int stat) {
+    return stat == 2 ? '1/1' : '0/1';
   }
 
   String _convertChargerType(String code) {

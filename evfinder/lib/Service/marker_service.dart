@@ -3,12 +3,17 @@ import 'package:evfinder/View/widget/charger_detail_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:evfinder/Service/favorite_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/ev_charger_model.dart'; // 또는 상대경로 맞게 수정
 
 class MarkerService {
   static MapCameraController cameraController = MapCameraController();
   static Set<String> _addedMarkerIds = {}; // ID 추적용
-  static List<NMarker> generateMarkers(List<EvCharger> chargers, BuildContext context, NaverMapController nMapController) {
+  static Future<List<NMarker>> generateMarkers(List<EvCharger> chargers, BuildContext context, NaverMapController nMapController)
+  async {
+    final prefs = await SharedPreferences.getInstance();
+    final uid = prefs.getString('uid') ?? '';
+
     return chargers.map((charger) {
       final marker = NMarker(
         id: charger.statId,
@@ -19,7 +24,7 @@ class MarkerService {
       marker.setOnTapListener((NMarker marker) async {
         cameraController.moveCameraPosition(charger.lat, charger.lng, nMapController);
 
-        final statIds = await FavoriteService.getFavoriteStatIds('test_user');
+        final statIds = await FavoriteService.getFavoriteStatIds(uid);
 
         // 디버깅용 출력
         print("📌 charger.statId = ${charger.statId} (${charger.statId.runtimeType})");
@@ -38,11 +43,12 @@ class MarkerService {
                 return ChargerDetailCard(
                   charger: charger,
                   isFavorite: _isFavorite,
+                  uid: uid,
                   onFavoriteToggle: () async {
                     if (_isFavorite) {
-                      await FavoriteService.removeFavorite("test_user", charger.statId);
+                      await FavoriteService.removeFavorite(uid, charger.statId);
                     } else {
-                      await FavoriteService.addFavorite("test_user", charger);
+                      await FavoriteService.addFavorite(uid, charger);
                     }
                     setModalState(() {
                       _isFavorite = !_isFavorite;

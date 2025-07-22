@@ -15,6 +15,8 @@ public class AuthService {
 
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private UserDataService userDataService;
 
     // 이메일/비밀번호 회원가입
     public LoginResponse signup(SignupRequest request) {
@@ -47,6 +49,9 @@ public class AuthService {
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
             String uid = decodedToken.getUid();
             String email = decodedToken.getEmail();
+
+            //사용자별 문서 생성
+            userDataService.createUserDocument(uid, email);
 
             String jwt = jwtUtil.generateToken(uid, email);
             return new LoginResponse(true, "로그인 성공", jwt);

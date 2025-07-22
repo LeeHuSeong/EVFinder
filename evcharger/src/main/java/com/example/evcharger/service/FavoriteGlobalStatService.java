@@ -38,11 +38,11 @@ public class FavoriteGlobalStatService {
         double chargerLat = Double.parseDouble(latObj.toString());
         double chargerLng = Double.parseDouble(lngObj.toString());
 
-        // 👉 여기서 사용자의 위치를 기준으로 거리 계산
+        // 사용자의 위치를 기준으로 거리 계산
         double distance = calculateDistance(userLat, userLng, chargerLat, chargerLng);
         favoriteData.put("distance", distance);
 
-        // 📌 기존대로 상태 및 주소도 갱신
+        // 기존대로 상태 및 주소도 갱신
         List<Map<String, Object>> nearby = findEvChargerService.getChargersBySidoCode(
             getSidoCodeFromFirestore(favoriteData),
             chargerLat, chargerLng

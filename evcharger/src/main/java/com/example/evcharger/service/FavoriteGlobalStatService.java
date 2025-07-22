@@ -15,10 +15,10 @@ public class FavoriteGlobalStatService {
     @Autowired
     private FindEvChargerService findEvChargerService;
 
-    public List<Map<String, Object>> getUpdatedFavorites(String userId, double userLat, double userLng) throws Exception {
+    public List<Map<String, Object>> getUpdatedFavorites(String uid, double userLat, double userLng) throws Exception {
     List<Map<String, Object>> updatedFavorites = new ArrayList<>();
 
-    var collection = firestore.collection("users").document(userId).collection("favorites");
+    var collection = firestore.collection("users").document(uid).collection("favorites");
     var docs = collection.get().get().getDocuments();
 
     for (var doc : docs) {

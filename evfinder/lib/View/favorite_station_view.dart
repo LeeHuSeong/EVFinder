@@ -46,9 +46,7 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
             "useTime": e['useTime']?.toString() ?? '',
             "stat": e['stat'] ?? 0,
             "statId": e['statId'],
-            'distance': e['distance'] != null
-                ? "${double.parse(e['distance'].toString()).toStringAsFixed(1)} km"
-                : '',
+            'distance': e['distance'] != null ? "${double.parse(e['distance'].toString()).toStringAsFixed(1)} km" : '',
             "isFavorite": true,
           };
         }).toList();
@@ -69,13 +67,9 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
         favoriteStations.removeAt(index);
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("즐겨찾기에서 제거됨")),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("즐겨찾기에서 제거됨")));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("즐겨찾기 제거 실패")),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("즐겨찾기 제거 실패")));
     }
   }
 
@@ -85,33 +79,35 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
       appBar: AppBar(title: Text('즐겨찾기 충전소')),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
+          : favoriteStations.isEmpty
+          ? Center(child: Text("즐겨찾기 목록이 존재하지 않습니다"))
           : SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView.separated(
-                  itemCount: favoriteStations.length,
-                  itemBuilder: (context, index) {
-                    final station = favoriteStations[index];
-                    return ListtileChargestarWidget(
-                      stationName: station['name'],
-                      stationAddress: station['addr'],
-                      operatingHours: station['useTime'] ?? '',
-                      chargerStat: station['stat'],
-                      distance: station['distance'] ?? '',
-                      isFavorite: station['isFavorite'],
-                      onFavoriteToggle: () => toggleFavorite(index),
-                    );
-                  },
-                  separatorBuilder: (context, index) => Divider(),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.separated(
+                        itemCount: favoriteStations.length,
+                        itemBuilder: (context, index) {
+                          final station = favoriteStations[index];
+                          return ListtileChargestarWidget(
+                            stationName: station['name'],
+                            stationAddress: station['addr'],
+                            operatingHours: station['useTime'] ?? '',
+                            chargerStat: station['stat'],
+                            distance: station['distance'] ?? '',
+                            isFavorite: station['isFavorite'],
+                            onFavoriteToggle: () => toggleFavorite(index),
+                          );
+                        },
+                        separatorBuilder: (context, index) => Divider(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
 
       //Refresh버튼
       floatingActionButton: FloatingActionButton(

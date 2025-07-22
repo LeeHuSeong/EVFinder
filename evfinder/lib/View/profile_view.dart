@@ -44,6 +44,12 @@ class _ProfileViewState extends State<ProfileView> {
   );
 }
 
+void handleDeleteAccount() {
+  _controller.deleteAccount(context);
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -90,6 +96,23 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ),
               const SizedBox(height: 10),
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: ElevatedButton(
+                    onPressed: handleDeleteAccount,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFEF4444), // red-500
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      '회원 탈퇴',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
 
                
               ],

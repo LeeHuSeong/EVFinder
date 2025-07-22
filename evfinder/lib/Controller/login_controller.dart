@@ -23,7 +23,7 @@ class LoginController {
     );
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const MainView()), // 또는 MainView
+      MaterialPageRoute(builder: (context) => const MainView()), // 또는 MainView 
     );
   }
 
@@ -167,4 +167,44 @@ class LoginController {
       );
     }
   }
+
+  Future<void> changePassword(BuildContext context, String newPassword) async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+    final idToken = await user?.getIdToken();
+
+    if (idToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("ID 토큰을 가져올 수 없습니다.")),
+      );
+      return;
+    }
+
+    final response = await http.post(
+      Uri.parse('${ApiConstants.authApiBaseUrl}/changepw'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'idToken': idToken,
+        'newPassword': newPassword,
+      }),
+    );
+
+    final decoded = jsonDecode(response.body);
+    if (decoded['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("비밀번호 변경 완료")),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("실패: ${decoded['message']}")),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("에러 발생: $e")),
+    );
+  }
+}
+
 }

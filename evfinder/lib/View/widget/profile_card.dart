@@ -10,23 +10,23 @@ class ProfileCard extends StatelessWidget {
         // Navigator.push(context, MaterialPageRoute(builder: (context) =>));
       },
       child: Padding(
-        padding: const EdgeInsets.only(left: 50.0, top: 50),
+        padding: const EdgeInsets.only(left: 20.0, top: 20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.account_circle, size: 90),
-            SizedBox(width: 40),
+            Icon(Icons.account_circle, size: 90, color: Colors.grey),
+            SizedBox(width: MediaQuery.of(context).size.width * 0.05),
             Padding(
               padding: const EdgeInsets.only(right: 15.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("유형우", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
-                  Text("개발자", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  Text("사용자", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                  Text("부제목", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   SizedBox(
                     width: 200,
-                    child: Text("프론트엔드, 백엔드, 데이베이스", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400), softWrap: true),
+                    child: Text("===설명===", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400), softWrap: true),
                   ),
                 ],
               ),

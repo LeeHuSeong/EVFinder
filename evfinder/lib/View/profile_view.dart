@@ -1,7 +1,10 @@
 import 'package:evfinder/View/widget/profile_card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../Controller/login_controller.dart';
 import '../View/change_password_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../View/login_view.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -21,6 +24,26 @@ class _ProfileViewState extends State<ProfileView> {
       MaterialPageRoute(builder: (context) => const ChangePasswordView()),
     );
   }
+
+  void handleLogout(BuildContext context) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  // Firebase 로그아웃
+  await FirebaseAuth.instance.signOut();
+
+  await prefs.remove('uid'); 
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (context) => const LoginView()),
+    (route) => false, 
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text("로그아웃 되었습니다.")),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -50,6 +73,23 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                 ),
                 const SizedBox(height: 10),
+                Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: ElevatedButton(
+                 onPressed: () => handleLogout(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6B7280), // gray-500
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    '로그아웃',
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
 
                
               ],

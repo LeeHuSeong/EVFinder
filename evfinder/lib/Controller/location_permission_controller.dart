@@ -30,7 +30,8 @@ class LocationPermissionController {
 
   Future<Position?> getCurrentLocation() async {
     try {
-      position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position resultPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      position = resultPosition;
       return position;
     } catch (e) {
       print('위치 가져오기 실패: $e');

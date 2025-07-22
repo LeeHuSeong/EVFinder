@@ -18,8 +18,12 @@ void main() async {
   await FlutterNaverMap().init(
     clientId: 'qe05hz13nm',
     onAuthFailed: (ex) => switch (ex) {
-      NQuotaExceededException(:final message) => print("사용량 초과 (message: $message)"),
-      NUnauthorizedClientException() || NClientUnspecifiedException() || NAnotherAuthFailedException() => print("인증 실패: $ex"),
+      NQuotaExceededException(:final message) => print(
+        "사용량 초과 (message: $message)",
+      ),
+      NUnauthorizedClientException() ||
+      NClientUnspecifiedException() ||
+      NAnotherAuthFailedException() => print("인증 실패: $ex"),
     },
   );
 
@@ -42,7 +46,6 @@ class MyApp extends StatelessWidget {
       locationPermissionController.permissionCheck();
     }); //위치 권한 확인
     return MaterialApp(
-      locale: Locale('ko', 'KR'), // 한국어로 설정
       title: 'EVFinder',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),

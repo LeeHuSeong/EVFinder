@@ -4,6 +4,7 @@ import 'package:evfinder/View/main_view.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'Controller/location_permission_controller.dart';
 import 'View/login_view.dart'; // 로그인 화면 import
 import 'View/station_list_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,12 +18,8 @@ void main() async {
   await FlutterNaverMap().init(
     clientId: 'qe05hz13nm',
     onAuthFailed: (ex) => switch (ex) {
-      NQuotaExceededException(:final message) => print(
-        "사용량 초과 (message: $message)",
-      ),
-      NUnauthorizedClientException() ||
-      NClientUnspecifiedException() ||
-      NAnotherAuthFailedException() => print("인증 실패: $ex"),
+      NQuotaExceededException(:final message) => print("사용량 초과 (message: $message)"),
+      NUnauthorizedClientException() || NClientUnspecifiedException() || NAnotherAuthFailedException() => print("인증 실패: $ex"),
     },
   );
 
@@ -40,7 +37,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var locationPermissionController = LocationPermissionController();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      locationPermissionController.permissionCheck();
+    }); //위치 권한 확인
     return MaterialApp(
+      locale: Locale('ko', 'KR'), // 한국어로 설정
       title: 'EVFinder',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),

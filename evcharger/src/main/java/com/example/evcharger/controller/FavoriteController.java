@@ -4,16 +4,12 @@ import com.google.cloud.firestore.Firestore;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.example.evcharger.model.Favorite;
 import com.example.evcharger.service.FavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import com.example.evcharger.model.ApiResponse;
 import java.util.Map;
-import com.example.evcharger.model.ApiResponse;
 
 //로그
 import org.slf4j.Logger;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:evfinder/Service/favorite_service.dart';
 import 'package:evfinder/View/widget/listtitle_Chargestar_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FavoriteStationView extends StatefulWidget {
   const FavoriteStationView({super.key});
@@ -12,12 +13,21 @@ class FavoriteStationView extends StatefulWidget {
 class _FavoriteStationViewState extends State<FavoriteStationView> {
   List<Map<String, dynamic>> favoriteStations = [];
   bool isLoading = true;
-  final String userId = 'test_user'; // TODO: SharedPreferences로 대체 예정
+  late String userId;
 
   @override
   void initState() {
     super.initState();
-    loadFavoriteStations();
+    _loadUidAndFavorites();
+  }
+
+  Future<void> _loadUidAndFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('uid') ?? '';
+    print("현재 uid = ${prefs.getString('uid')}");
+    print("현재 userId = ${prefs.getString('userId')}");
+
+    await loadFavoriteStations();
   }
 
   Future<void> loadFavoriteStations() async {

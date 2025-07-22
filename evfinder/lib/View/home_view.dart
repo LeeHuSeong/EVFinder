@@ -1,5 +1,6 @@
 import 'package:evfinder/Controller/location_permission_controller.dart';
 import 'package:evfinder/Controller/map_camera_controller.dart';
+import 'package:evfinder/Service/location_service.dart';
 import 'package:evfinder/View/search_charger_view.dart';
 import 'package:evfinder/View/widget/search_appbar_widget.dart';
 import 'package:evfinder/View/widget/slidingUp_Panel_widget.dart';
@@ -28,6 +29,8 @@ class _HomeViewState extends State<HomeView> {
   bool _isMapReady = false;
   final LocationPermissionController locationController = LocationPermissionController();
   bool isLocationLoaded = false;
+  Position? userPosition;
+  String addressname = '서울특별시 중구 세종대로 110';
 
   @override
   void initState() {
@@ -37,33 +40,41 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> _initializeLocation() async {
-    await locationController.getCurrentLocation();
-
-    setState(() {
-      isLocationLoaded = true;
-      if (isLocationLoaded && locationController.position != null) {
-        //권한이 있으면 실행, 위도 경도로 도로명 주소 받아 와서 fetchChargers() 실행 해야함
-        cameraController.moveCameraPosition(locationController.position!.latitude, locationController.position!.longitude, _nMapController);
+    try {
+      Position? position = await locationController.getCurrentLocation();
+      if (mounted) {
+        setState(() {
+          userPosition = position;
+          isLocationLoaded = true;
+        });
       }
-    });
+    } catch (e) {
+      print('위치 가져오기 실패: $e');
+      if (mounted) {
+        setState(() {
+          isLocationLoaded = true; // 실패해도 지도는 보여주기
+        });
+      }
+    }
   }
 
-  Future<void> fetchSearchResult(BuildContext context, MapCameraController ncController, dynamic result) async {
+  Future<void> fetchMyChargers(BuildContext context, MapCameraController ncController, dynamic result) async {
     if (result != null && result is SearchChargers) {
       // 새 리스트로 fetch
       if (_markers.isNotEmpty) {
         MarkerService.removeMarkers(_nMapController, _markers);
       }
-
-      await fetchChargers(result.addressName);
-
+      addressname = result.addressName;
       // 마커 새로 로딩
       _loadMarkers(_chargers); // 이 부분 꼭 필요!
-
       setState(() {}); // UI 갱신을 위해 필요할 수도 있음
     } else {
-      await fetchChargers("서울특별시 중구 세종대로 110");
+      if (isLocationLoaded && locationController.position != null) {
+        final addressResultName = LocationService.changeGPStoAddressName(locationController.position!.latitude, locationController.position!.longitude);
+        addressname = await addressResultName;
+      }
     }
+    await fetchChargers(addressname);
   }
 
   Future<void> fetchChargers(String addressName) async {
@@ -85,13 +96,21 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     cameraController = MapCameraController();
+    if (!isLocationLoaded) {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return SafeArea(
       child: Stack(
         children: [
           NaverMap(
-            options: const NaverMapViewOptions(initialCameraPosition: NCameraPosition(target: NLatLng(37.5665, 126.9780), zoom: 15)),
+            options: NaverMapViewOptions(
+              initialCameraPosition: NCameraPosition(
+                target: userPosition != null ? NLatLng(userPosition!.latitude, userPosition!.longitude) : const NLatLng(37.5665, 126.9780),
+                zoom: 15,
+              ),
+            ),
             onMapReady: (controller) async {
-              await fetchSearchResult(context, cameraController, null);
+              await fetchMyChargers(context, cameraController, null);
               _nMapController = controller;
               setState(() {
                 _isMapReady = true;
@@ -104,7 +123,7 @@ class _HomeViewState extends State<HomeView> {
             child: SearchAppbarWidget(
               onTap: () async {
                 final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => SearchChargerView()));
-                await fetchSearchResult(context, cameraController, result);
+                await fetchMyChargers(context, cameraController, result);
               },
             ),
           ),

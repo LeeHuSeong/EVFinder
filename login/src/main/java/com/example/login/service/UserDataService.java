@@ -18,6 +18,7 @@ public class UserDataService {
         Map<String, Object> data = new HashMap<>();
         data.put("email", email);
         data.put("createdAt", System.currentTimeMillis());
+        data.put("uid", uid);
 
         userDoc.set(data); // 사용자 문서 생성
     }

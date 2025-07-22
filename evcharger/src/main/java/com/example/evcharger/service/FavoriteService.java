@@ -24,7 +24,7 @@ public class FavoriteService {
     @Autowired
     private Firestore firestore;
 
-    public ApiResponse addFavorite(String userId, Map<String, Object> stationData) {
+    public ApiResponse addFavorite(String uid, Map<String, Object> stationData) {
         try {
             String statId = (String) stationData.get("statId");
 
@@ -34,7 +34,7 @@ public class FavoriteService {
 
             DocumentReference docRef = firestore
                     .collection("users")
-                    .document(userId)
+                    .document(uid)
                     .collection("favorites")
                     .document(statId);
 
@@ -47,15 +47,15 @@ public class FavoriteService {
     }
 
     //삭제시 로그 추가
-    public ApiResponse removeFavorite(String userId, String statId) {
+    public ApiResponse removeFavorite(String uid, String statId) {
         try {
             DocumentReference docRef = firestore
                     .collection("users")
-                    .document(userId)
+                    .document(uid)
                     .collection("favorites")
                     .document(statId);
             
-            System.out.println("[삭제 시도] userId = " + userId + ", statId = " + statId);
+            System.out.println("[삭제 시도] uid = " + uid + ", statId = " + statId);
             System.out.println("[Firestore 경로] " + docRef.getPath());
 
             docRef.delete().get();  // 동기
@@ -67,11 +67,11 @@ public class FavoriteService {
         }
     }
 
-    public List<Map<String, Object>> getFavorites(String userId) {
+    public List<Map<String, Object>> getFavorites(String uid) {
         try {
             CollectionReference ref = firestore
                     .collection("users")
-                    .document(userId)
+                    .document(uid)
                     .collection("favorites");
 
             ApiFuture<QuerySnapshot> future = ref.get();
@@ -82,7 +82,7 @@ public class FavoriteService {
                 result.add(doc.getData());
             }
             //테스트 로그(유저별 uid)
-            System.out.println("[getFavorites] userId = " + userId);
+            System.out.println("[getFavorites] uid = " + uid);
 
             return result;
         } 
@@ -93,11 +93,11 @@ public class FavoriteService {
 
     
     //stat업데이트 해주기.
-    public ApiResponse updateStat(String userId, String statId, int stat) {
+    public ApiResponse updateStat(String uid, String statId, int stat) {
     try {
         DocumentReference docRef = firestore
             .collection("users")
-            .document(userId)
+            .document(uid)
             .collection("favorites")
             .document(statId);
 

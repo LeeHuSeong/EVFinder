@@ -72,7 +72,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> _loadMarkers(List<EvCharger> chargers) async {
-    _markers = MarkerService.generateMarkers(chargers, context, _nMapController);
+    _markers = await MarkerService.generateMarkers(chargers, context, _nMapController);
     for (var marker in _markers) {
       try {
         await _nMapController.addOverlay(marker);

@@ -16,13 +16,13 @@ public class FavoriteGlobalStatController {
 
     @GetMapping("/listWithStat")
     public ResponseEntity<?> getFavoritesWithStatGlobal(
-        @RequestParam String userId,
+        @RequestParam String uid,
         @RequestParam double lat,
         @RequestParam double lng
     ) 
     {
         try {
-            var result = favoriteGlobalStatService.getUpdatedFavorites(userId, lat, lng);
+            var result = favoriteGlobalStatService.getUpdatedFavorites(uid, lat, lng);
             return ResponseEntity.ok(Map.of("favorites", result));
         }
         catch (Exception e) {

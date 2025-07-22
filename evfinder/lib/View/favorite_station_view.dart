@@ -13,7 +13,7 @@ class FavoriteStationView extends StatefulWidget {
 class _FavoriteStationViewState extends State<FavoriteStationView> {
   List<Map<String, dynamic>> favoriteStations = [];
   bool isLoading = true;
-  late String userId;
+  late String uid;
 
   @override
   void initState() {
@@ -23,7 +23,7 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
 
   Future<void> _loadUidAndFavorites() async {
     final prefs = await SharedPreferences.getInstance();
-    userId = prefs.getString('uid') ?? '';
+    uid = prefs.getString('uid') ?? '';
     print("현재 uid = ${prefs.getString('uid')}");
     print("현재 userId = ${prefs.getString('userId')}");
 
@@ -35,7 +35,7 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
 
     try {
       // 1. 서버에서 즐겨찾기 목록 + 최신 stat + 거리정보 포함해서 가져오기
-      final rawFavorites = await FavoriteService.fetchFavoritesWithStat(userId: userId);
+      final rawFavorites = await FavoriteService.fetchFavoritesWithStat(uid: uid);
 
       // 2. 바로 UI에 사용할 수 있도록 매핑
       setState(() {
@@ -63,7 +63,7 @@ class _FavoriteStationViewState extends State<FavoriteStationView> {
   Future<void> toggleFavorite(int index) async {
     final statId = favoriteStations[index]['statId'];
 
-    final success = await FavoriteService.removeFavorite(userId, statId);
+    final success = await FavoriteService.removeFavorite(uid, statId);
     if (success) {
       setState(() {
         favoriteStations.removeAt(index);

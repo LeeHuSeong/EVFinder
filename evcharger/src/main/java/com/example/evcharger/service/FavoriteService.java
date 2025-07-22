@@ -81,6 +81,8 @@ public class FavoriteService {
             for (QueryDocumentSnapshot doc : documents) {
                 result.add(doc.getData());
             }
+            //테스트 로그(유저별 uid)
+            System.out.println("[getFavorites] userId = " + userId);
 
             return result;
         } 

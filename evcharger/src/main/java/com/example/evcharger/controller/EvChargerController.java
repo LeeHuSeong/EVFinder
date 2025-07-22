@@ -1,6 +1,7 @@
 package com.example.evcharger.controller;
 
 import com.example.evcharger.service.EvChargerService;
+import com.example.evcharger.service.FindCurrPosition;
 import com.example.evcharger.service.FindEvChargerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,11 @@ public class EvChargerController {
     @Autowired
     private EvChargerService evChargerService;
     
-    private FindEvChargerService chargerService;
-
     @Autowired
     private FindEvChargerService findEvChargerService;
+
+    @Autowired
+    private FindCurrPosition findCurrPosition;
 
     @GetMapping("/geocode")
     public ResponseEntity<?> getCoordsWithSidoCode(@RequestParam String query) {
@@ -49,6 +51,21 @@ public class EvChargerController {
         }
     }
 
+    @GetMapping("/coord2addr")
+    public ResponseEntity<?> getAddr(@RequestParam double lat, @RequestParam double lng) {
+        try {
+            Map<String, Object> address_name = findCurrPosition.getAddr(lat, lng);
+
+            Map<String,Object> result = (Map<String,Object>) address_name.get("address_name");
+
+            String addressName = (String) result.get("address_name");
+
+            return ResponseEntity.ok(Map.of("address_name", addressName));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+    
     @GetMapping("/findevc")
     public ResponseEntity<?> autoFindEvChargers(@RequestParam String query) {
         try {
@@ -73,7 +90,7 @@ public class EvChargerController {
     public ResponseEntity<?> getStatByStatId(@RequestParam String statId) {
         try {
             int stat = findEvChargerService.getStatByStatId(statId);
-            return ResponseEntity.ok(Map.of("stat", stat));  // ← 여기를 Map으로 감싸기
+            return ResponseEntity.ok(Map.of("stat", stat));
         } catch (Exception e) {
             return ResponseEntity.status(404).body(Map.of("error", "Stat not found for statId: " + statId));
         }

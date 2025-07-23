@@ -22,12 +22,12 @@ class ProfileCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("사용자", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
-                  Text("부제목", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                  SizedBox(
-                    width: 200,
-                    child: Text("===설명===", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400), softWrap: true),
-                  ),
+                  Text("user", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                  Text("test123@naver.com", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  // SizedBox(
+                  //   width: 200,
+                  //   child: Text("===설명===", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400), softWrap: true),
+                  // ),
                 ],
               ),
             ),

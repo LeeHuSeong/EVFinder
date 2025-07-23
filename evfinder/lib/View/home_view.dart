@@ -58,23 +58,25 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  Future<void> fetchMyChargers(BuildContext context, MapCameraController ncController, dynamic result) async {
+  Future<void> fetchMyChargers(BuildContext context, dynamic result) async {
     if (result != null && result is SearchChargers) {
       // 새 리스트로 fetch
       if (_markers.isNotEmpty) {
         MarkerService.removeMarkers(_nMapController, _markers);
       }
       addressname = result.addressName;
+      await fetchChargers(addressname);
       // 마커 새로 로딩
       _loadMarkers(_chargers); // 이 부분 꼭 필요!
+      cameraController.moveCameraPosition(double.parse(result.y), double.parse(result.x), _nMapController);
       setState(() {}); // UI 갱신을 위해 필요할 수도 있음
     } else {
       if (isLocationLoaded && locationController.position != null) {
         final addressResultName = LocationService.changeGPStoAddressName(locationController.position!.latitude, locationController.position!.longitude);
         addressname = await addressResultName;
+        await fetchChargers(addressname);
       }
     }
-    await fetchChargers(addressname);
   }
 
   Future<void> fetchChargers(String addressName) async {
@@ -87,6 +89,7 @@ class _HomeViewState extends State<HomeView> {
     for (var marker in _markers) {
       try {
         await _nMapController.addOverlay(marker);
+        await MarkerService.addMarkersToMap(_nMapController, _markers);
       } catch (e) {
         print("마커 추가 실패: ${marker.info.id}, 이유: $e");
       }
@@ -110,12 +113,14 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
             onMapReady: (controller) async {
-              await fetchMyChargers(context, cameraController, null);
-              _nMapController = controller;
-              setState(() {
-                _isMapReady = true;
-              });
-              _loadMarkers(_chargers); // 서버에서 충전소 받아와서 마커 표시
+              if (_isMapReady == false) {
+                await fetchMyChargers(context, null);
+                _nMapController = controller;
+                setState(() {
+                  _isMapReady = true;
+                });
+                _loadMarkers(_chargers); // 서버에서 충전소 받아와서 마커 표시
+              }
             },
           ),
           Positioned(
@@ -123,7 +128,7 @@ class _HomeViewState extends State<HomeView> {
             child: SearchAppbarWidget(
               onTap: () async {
                 final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => SearchChargerView()));
-                await fetchMyChargers(context, cameraController, result);
+                await fetchMyChargers(context, result);
               },
             ),
           ),

@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:evfinder/Controller/location_permission_controller.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import '../Model/ev_charger_model.dart';
 import '../constants/api_constants.dart';
 
@@ -24,15 +26,11 @@ class FavoriteService {
         "stat": charger.stat,
         "distance": charger.distance,
         "timestamp": DateTime.now().toIso8601String(),
-      }
+      },
     };
     print('[DEBUG] 즐겨찾기 추가 요청: $body');
 
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(body),
-    );
+    final response = await http.post(url, headers: {"Content-Type": "application/json"}, body: jsonEncode(body));
     print('[DEBUG] 응답 코드: ${response.statusCode}');
     print('[DEBUG] 응답 내용: ${response.body}');
     return response.statusCode == 200;
@@ -51,25 +49,27 @@ class FavoriteService {
     }
   }
 
-
   static Future<bool> removeFavorite(String uid, String statId) async {
     final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/remove?uid=$uid&statId=$statId');
     final response = await http.delete(url);
     return response.statusCode == 200;
   }
 
+  // 임시값 (서울)
+  static double userLat = 37.5665;
+  static double userLng = 126.9780;
 
-  static Future<List<Map<String, dynamic>>> fetchFavoritesWithStat({
-    required String uid,
-  }) async {
-
-    // 임시값 (서울)
-    final double userLat = 37.5665;
-    final double userLng = 126.9780;
+  static Future<List<Map<String, dynamic>>> fetchFavoritesWithStat({required String uid}) async {
+    if (await Permission.location.isGranted) {
+      LocationPermissionController locationController = LocationPermissionController();
+      await locationController.getCurrentLocation();
+      userLat = locationController.position!.latitude;
+      userLng = locationController.position!.longitude;
+    }
 
     final url = Uri.parse(
       '${ApiConstants.favoriteApiBaseUrl}/global/listWithStat'
-          '?uid=$uid&lat=$userLat&lng=$userLng',
+      '?uid=$uid&lat=$userLat&lng=$userLng',
     );
 
     final response = await http.get(url);
@@ -83,20 +83,12 @@ class FavoriteService {
 
         return list.map((e) {
           final rawDistance = e['distance'];
-          final parsedDistance = (rawDistance is num)
-              ? rawDistance
-              : double.tryParse(rawDistance.toString()) ?? 0.0;
+          final parsedDistance = (rawDistance is num) ? rawDistance : double.tryParse(rawDistance.toString()) ?? 0.0;
 
           final rawStat = e['stat'];
-          final parsedStat = (rawStat is int)
-              ? rawStat
-              : int.tryParse(rawStat.toString()) ?? -1;
+          final parsedStat = (rawStat is int) ? rawStat : int.tryParse(rawStat.toString()) ?? -1;
 
-          return {
-            ...e,
-            'distance': parsedDistance.toStringAsFixed(1),
-            'stat': parsedStat,
-          };
+          return {...e, 'distance': parsedDistance.toStringAsFixed(1), 'stat': parsedStat};
         }).toList();
       } else {
         throw Exception('Unexpected response format');
@@ -105,8 +97,6 @@ class FavoriteService {
       throw Exception('Failed to fetch updated favorite chargers');
     }
   }
-
-
 
   static Future<int> fetchStat(String statId) async {
     final url = Uri.parse('${ApiConstants.evApiBaseUrl}/stat?statId=$statId');
@@ -122,7 +112,6 @@ class FavoriteService {
       throw Exception('Failed to fetch stat for $statId');
     }
   }
-
 
   static Future<List<String>> getFavoriteStatIds(String uid) async {
     final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/list?uid=$uid');
@@ -144,21 +133,12 @@ class FavoriteService {
     }
   }
 
-
   static Future<bool> updateStat(String uid, String statId, int stat) async {
     final url = Uri.parse('${ApiConstants.favoriteApiBaseUrl}/updateStat');
 
-    final body = {
-      "uid": uid,
-      "statId": statId,
-      "stat": stat,
-    };
+    final body = {"uid": uid, "statId": statId, "stat": stat};
 
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(body),
-    );
+    final response = await http.post(url, headers: {"Content-Type": "application/json"}, body: jsonEncode(body));
 
     return response.statusCode == 200;
   }

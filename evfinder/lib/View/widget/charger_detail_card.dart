@@ -46,9 +46,9 @@ class _ChargerDetailCardState extends State<ChargerDetailCard> {
         _isFavorite = !_isFavorite;
       });
 
-      if (widget.onFavoriteToggle != null) {
-        widget.onFavoriteToggle!();
-      }
+      // if (widget.onFavoriteToggle != null) {
+      //   widget.onFavoriteToggle!();
+      // }
     } catch (e) {
       print(" 즐겨찾기 처리 오류: $e");
     } finally {

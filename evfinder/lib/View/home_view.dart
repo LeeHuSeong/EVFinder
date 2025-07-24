@@ -74,8 +74,8 @@ class _HomeViewState extends State<HomeView> {
       if (isLocationLoaded && locationController.position != null) {
         final addressResultName = LocationService.changeGPStoAddressName(locationController.position!.latitude, locationController.position!.longitude);
         addressname = await addressResultName;
-        await fetchChargers(addressname);
       }
+      await fetchChargers(addressname);
     }
   }
 

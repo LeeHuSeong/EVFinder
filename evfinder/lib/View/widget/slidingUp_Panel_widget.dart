@@ -2,6 +2,7 @@ import 'package:evfinder/View/widget/listtile_ChargerInfo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_sliding_box/flutter_sliding_box.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Controller/map_camera_controller.dart';
 import '../../Model/ev_charger_model.dart';
@@ -21,6 +22,20 @@ class SlidingupPanelWidget extends StatefulWidget {
 
 class _SlidingupPanelWidgetState extends State<SlidingupPanelWidget> {
   static MapCameraController cameraController = MapCameraController();
+  String _uid = '';
+  @override
+  void initState() {
+    super.initState();
+    _loadUid();
+  }
+
+  //uid 가져오기
+  Future<void> _loadUid() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _uid = prefs.getString('uid') ?? '';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +61,11 @@ class _SlidingupPanelWidgetState extends State<SlidingupPanelWidget> {
                 final isFavorite = statIds.contains(widget.chargers[index].statId);
                 showModalBottomSheet(
                   context: context,
-                  builder: (_) => ChargerDetailCard(charger: widget.chargers[index], isFavorite: isFavorite),
+                  builder: (_) => ChargerDetailCard(
+                      charger: widget.chargers[index],
+                      isFavorite: isFavorite,
+                      uid :_uid,
+                  ),
                 );
               },
               isStatChip: true,

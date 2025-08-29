@@ -31,7 +31,10 @@ class _ProfileViewState extends State<ProfileView> {
   // Firebase 로그아웃
   await FirebaseAuth.instance.signOut();
 
-  await prefs.remove('uid'); 
+  // await prefs.remove('uid');
+  // await prefs.remove('userId');
+  // await prefs.remove('jwt');
+  await prefs.clear();
 
   Navigator.pushAndRemoveUntil(
     context,

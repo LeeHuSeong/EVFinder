@@ -9,15 +9,15 @@ public class Favorite {
     @Id
     private String id;
 
-    private String userId;
+    private String uid;
     private String stationId;
 
     public Favorite() {}
 
-    public Favorite(String userId, String stationId) {
-        this.userId = userId;
+    public Favorite(String uid, String stationId) {
+        this.uid = uid;
         this.stationId = stationId;
-        this.id = userId + "_" + stationId;
+        this.id = uid + "_" + stationId;
     }
 
     public String getId() {
@@ -28,12 +28,12 @@ public class Favorite {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUid() {
+        return uid;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getStationId() {
